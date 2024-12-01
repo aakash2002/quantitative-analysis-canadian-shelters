@@ -1,77 +1,58 @@
 #### Preamble ####
-# Purpose: Tests the structure and validity of the analysis Toronto outbreak dataset
+# Purpose: Test the various models predictive power on testing data of Canada shelter service
 # Author: Aakash Vaithyanathan
-# Date: 28 November 2024
+# Date: 30 November, 2024
 # Contact: aakash.vaithyanathan@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: 
-# - The `testthat` package must be installed and loaded
-# - The `tidyverse` package must be installed and loaded
-# - 02-download_data.R must have been run first
-# - 03-clean_data.R must have been run second
+# - The 'tidyverse' package must be loaded
+# - The 'arrow' package must be loaded
+# - The 'rstanarm' package must be loaded
+# - 05-model_data.R must be run first
 # Any other information needed? None
-
 
 #### Workspace setup ####
 library(tidyverse)
-library(testthat)
+library(arrow)
+library(rstanarm)
 
-# Load the analysis data
-data <- read_csv(here::here("data/02-analysis_data/analysis_data.csv"))
+# Set seed
+set.seed(282024)
 
-# //////////////////////////
-# Testing the analysis data
-# //////////////////////////
+#### Read data ####
+test_data <- read_parquet(here::here("data/02-analysis_data/analysis_test_shelter_service.parquet"))
 
-#### Test data ####
+#### Load the trained models data ####
+poisson_model <- readRDS(here::here("models/poisson_model.rds"))
+neg_binomial_model_basic <- readRDS(here::here("models/neg_binomial_model_basic.rds"))
+neg_binomial_model_interaction <- readRDS(here::here("models/neg_binomial_model_interaction.rds"))
 
-# Test for NA Values
-test_that("only 'outbreak_over_year' and 'outbreak_over_month' contain NAs", {
-  expect_true(all(is.na(data$outbreak_over_year) == is.na(data$outbreak_over_month)))
-  expect_true(all(is.na(data$outbreak_over_year) | !is.na(data$outbreak_over_month)))
-  expect_false(any(is.na(data$institution_name)))
-  expect_false(any(is.na(data$institution_address)))
-  expect_false(any(is.na(data$outbreak_setting)))
-  expect_false(any(is.na(data$type_of_outbreak)))
-  expect_false(any(is.na(data$causative_agent_1)))
-  expect_false(any(is.na(data$causative_agent_2)))
-  expect_false(any(is.na(data$active)))
-  #### Preamble ####
-  # Purpose: Models... [...UPDATE THIS...]
-  # Author: Rohan Alexander [...UPDATE THIS...]
-  # Date: 11 February 2023 [...UPDATE THIS...]
-  # Contact: rohan.alexander@utoronto.ca [...UPDATE THIS...]
-  # License: MIT
-  # Pre-requisites: [...UPDATE THIS...]
-  # Any other information needed? [...UPDATE THIS...]
-  
-  
-  #### Workspace setup ####
-  library(tidyverse)
-  library(rstanarm)
-  
-  #### Read data ####
-  analysis_data <- read_csv("data/analysis_data/analysis_data.csv")
-  
-  ### Model data ####
-  first_model <-
-    stan_glm(
-      formula = flying_time ~ length + width,
-      data = analysis_data,
-      family = gaussian(),
-      prior = normal(location = 0, scale = 2.5, autoscale = TRUE),
-      prior_intercept = normal(location = 0, scale = 2.5, autoscale = TRUE),
-      prior_aux = exponential(rate = 1, autoscale = TRUE),
-      seed = 853
-    )
-  
-  
-  #### Save model ####
-  saveRDS(
-    first_model,
-    file = "models/first_model.rds"
-  )
-  
+
+#### Run the model on test data ####
+
+# Predictions for each model
+poisson_preds <- predict(poisson_model, newdata = test_data)
+neg_binomial_basic_preds <- predict(neg_binomial_model_basic, newdata = test_data)
+neg_binomial_interaction_preds <- predict(neg_binomial_model_interaction, newdata = test_data)
+
+# Calculate RMSE for each model's predictions
+rmse_poisson <- sqrt(mean((poisson_preds - test_data$service_user_count)^2))
+rmse_neg_binomial_basic <- sqrt(mean((neg_binomial_basic_preds - test_data$service_user_count)^2))
+rmse_neg_binomial_interaction <- sqrt(mean((neg_binomial_interaction_preds - test_data$service_user_count)^2))
+
+# Calculate MAE for each model's predictions
+mae_poisson <- mean(abs(poisson_preds - test_data$service_user_count))
+mae_neg_binomial_basic <- mean(abs(neg_binomial_basic_preds - test_data$service_user_count))
+mae_neg_binomial_interaction <- mean(abs(neg_binomial_interaction_preds - test_data$service_user_count))
+
+# Print MAE values
+cat("MAE for Poisson model:", mae_poisson, "\n")
+cat("MAE for Basic Negative Binomial model:", mae_neg_binomial_basic, "\n")
+cat("MAE for Interaction Negative Binomial model:", mae_neg_binomial_interaction, "\n")
+# Print RMSE values
+cat("RMSE for Poisson model:", rmse_poisson, "\n")
+cat("RMSE for Neg Binomial basic model:", rmse_neg_binomial_basic, "\n")
+cat("RMSE for Neg Binomial interaction model:", rmse_neg_binomial_interaction, "\n")
   
   
 
