@@ -1,0 +1,301 @@
+year,month,shelter_name,city,population_type,count_seeking_shelter
+2007,2,YMCA,Mississauga,Men,661
+2020,10,Covenant House,Whitby,Elderly,981
+2013,4,Shepherds of Good Hope,Whitby,Youth,623
+2002,7,Salvation Army,Whitby,Women,900
+2013,11,Covenant House,Oakvile,Men,665
+2005,1,Kennedy House Youth Services,Oakvile,Elderly,552
+2023,6,Kennedy House Youth Services,Oakvile,Youth,500
+2014,1,Kennedy House Youth Services,Whitby,Elderly,647
+2013,1,Salvation Army,Oakvile,Indigenous,726
+2018,2,Shepherds of Good Hope,Oakvile,Indigenous,186
+2020,3,Covenant House,Mississauga,Men,213
+2003,6,CAIRD,Oakvile,Youth,401
+2019,9,Salvation Army,Whitby,Women,896
+2016,10,Covenant House,Mississauga,Elderly,216
+2002,11,Kennedy House Youth Services,Whitby,Youth,837
+2016,1,CAIRD,Scarborough,Elderly,191
+2002,2,CAIRD,Scarborough,Youth,861
+2002,11,Shepherds of Good Hope,Oakvile,Indigenous,309
+2004,1,Salvation Army,Oakvile,Youth,230
+2006,10,Covenant House,Toronto,Women,313
+2023,9,Shepherds of Good Hope,Toronto,Indigenous,526
+2006,4,Shepherds of Good Hope,Toronto,Indigenous,418
+2017,1,Salvation Army,Scarborough,Men,767
+2019,1,Shepherds of Good Hope,Oakvile,Youth,965
+2021,2,Kennedy House Youth Services,Oakvile,Elderly,131
+2011,3,YMCA,Mississauga,Men,578
+2014,8,CAIRD,Mississauga,Men,129
+2014,10,YMCA,Mississauga,Women,844
+2005,6,CAIRD,Toronto,Women,525
+2015,4,Kennedy House Youth Services,Scarborough,Elderly,544
+2011,2,YMCA,Toronto,Youth,221
+2016,1,Salvation Army,Oakvile,Youth,577
+2010,10,CAIRD,Toronto,Men,633
+2022,6,Kennedy House Youth Services,Oakvile,Men,595
+2021,7,Covenant House,Oakvile,Women,584
+2014,4,YMCA,Scarborough,Men,745
+2002,3,Kennedy House Youth Services,Oakvile,Men,284
+2001,4,Salvation Army,Scarborough,Youth,378
+2016,5,Salvation Army,Oakvile,Youth,564
+2000,11,Shepherds of Good Hope,Whitby,Indigenous,350
+2001,7,Kennedy House Youth Services,Whitby,Indigenous,114
+2015,7,YMCA,Whitby,Women,364
+2018,4,Salvation Army,Scarborough,Youth,351
+2018,7,Kennedy House Youth Services,Mississauga,Indigenous,889
+2003,9,YMCA,Whitby,Women,767
+2019,1,YMCA,Toronto,Elderly,801
+2021,4,CAIRD,Toronto,Women,526
+2010,2,Shepherds of Good Hope,Toronto,Elderly,718
+2001,10,Shepherds of Good Hope,Oakvile,Women,316
+2004,10,Salvation Army,Toronto,Women,958
+2015,2,CAIRD,Oakvile,Elderly,434
+2004,7,CAIRD,Whitby,Youth,694
+2008,2,Shepherds of Good Hope,Mississauga,Elderly,252
+2017,7,Covenant House,Scarborough,Elderly,103
+2002,1,YMCA,Oakvile,Elderly,592
+2021,11,Covenant House,Oakvile,Men,913
+2002,2,CAIRD,Scarborough,Indigenous,402
+2002,8,Kennedy House Youth Services,Whitby,Elderly,682
+2023,4,CAIRD,Toronto,Women,583
+2017,3,CAIRD,Toronto,Women,585
+2002,1,YMCA,Whitby,Youth,524
+2020,9,YMCA,Scarborough,Elderly,212
+2012,7,CAIRD,Oakvile,Youth,997
+2001,4,YMCA,Whitby,Indigenous,441
+2018,2,Kennedy House Youth Services,Toronto,Indigenous,786
+2019,6,Covenant House,Whitby,Elderly,104
+2018,11,Salvation Army,Oakvile,Men,375
+2018,8,Kennedy House Youth Services,Scarborough,Elderly,832
+2000,5,Salvation Army,Oakvile,Indigenous,287
+2016,10,Covenant House,Oakvile,Elderly,708
+2007,6,Salvation Army,Whitby,Indigenous,803
+2007,4,Salvation Army,Toronto,Women,548
+2009,4,Shepherds of Good Hope,Scarborough,Indigenous,685
+2000,3,YMCA,Toronto,Women,257
+2000,10,Kennedy House Youth Services,Scarborough,Youth,862
+2023,2,YMCA,Oakvile,Youth,178
+2019,7,Covenant House,Mississauga,Women,232
+2002,10,Shepherds of Good Hope,Mississauga,Women,349
+2006,9,Salvation Army,Oakvile,Women,182
+2015,8,CAIRD,Scarborough,Indigenous,420
+2019,11,YMCA,Whitby,Elderly,974
+2016,4,Covenant House,Oakvile,Youth,679
+2011,2,Salvation Army,Toronto,Elderly,909
+2016,10,Shepherds of Good Hope,Whitby,Youth,668
+2005,6,CAIRD,Oakvile,Youth,376
+2014,4,Kennedy House Youth Services,Toronto,Elderly,110
+2015,5,CAIRD,Scarborough,Men,369
+2011,5,Kennedy House Youth Services,Mississauga,Elderly,978
+2020,4,YMCA,Toronto,Men,112
+2018,4,Covenant House,Whitby,Women,721
+2011,8,Covenant House,Oakvile,Indigenous,579
+2011,5,Kennedy House Youth Services,Mississauga,Men,269
+2003,9,Kennedy House Youth Services,Scarborough,Indigenous,748
+2008,5,Shepherds of Good Hope,Oakvile,Indigenous,481
+2022,1,Kennedy House Youth Services,Oakvile,Elderly,489
+2019,4,CAIRD,Scarborough,Men,430
+2003,11,Kennedy House Youth Services,Oakvile,Men,823
+2005,7,Shepherds of Good Hope,Oakvile,Men,195
+2022,7,Kennedy House Youth Services,Mississauga,Indigenous,921
+2018,5,Shepherds of Good Hope,Toronto,Elderly,895
+2004,2,Kennedy House Youth Services,Mississauga,Elderly,283
+2018,7,Salvation Army,Mississauga,Women,471
+2007,10,YMCA,Whitby,Women,234
+2006,11,YMCA,Mississauga,Elderly,126
+2001,7,Shepherds of Good Hope,Mississauga,Youth,693
+2017,4,YMCA,Mississauga,Women,493
+2011,6,Kennedy House Youth Services,Whitby,Women,506
+2021,9,Covenant House,Scarborough,Youth,328
+2010,9,Salvation Army,Whitby,Men,168
+2022,6,CAIRD,Scarborough,Youth,479
+2014,2,CAIRD,Toronto,Elderly,142
+2002,3,CAIRD,Mississauga,Youth,345
+2004,3,Salvation Army,Scarborough,Youth,568
+2022,3,CAIRD,Mississauga,Elderly,798
+2000,9,Salvation Army,Oakvile,Elderly,890
+2016,11,Shepherds of Good Hope,Scarborough,Women,132
+2015,2,Salvation Army,Mississauga,Elderly,462
+2015,5,Kennedy House Youth Services,Whitby,Men,707
+2023,5,YMCA,Mississauga,Men,950
+2002,11,YMCA,Mississauga,Women,308
+2006,11,Covenant House,Whitby,Indigenous,181
+2013,10,Covenant House,Scarborough,Indigenous,725
+2001,10,CAIRD,Oakvile,Elderly,892
+2019,7,Salvation Army,Oakvile,Women,204
+2014,6,Covenant House,Oakvile,Youth,268
+2023,1,Shepherds of Good Hope,Scarborough,Women,938
+2018,10,Shepherds of Good Hope,Toronto,Indigenous,612
+2020,6,Covenant House,Toronto,Youth,132
+2014,8,Covenant House,Scarborough,Youth,159
+2002,10,Kennedy House Youth Services,Scarborough,Men,248
+2023,4,Shepherds of Good Hope,Mississauga,Men,914
+2012,4,Covenant House,Mississauga,Youth,117
+2001,2,Covenant House,Whitby,Women,887
+2016,1,Covenant House,Mississauga,Women,883
+2016,3,Kennedy House Youth Services,Scarborough,Women,339
+2006,10,CAIRD,Whitby,Men,202
+2013,9,Covenant House,Whitby,Women,943
+2010,10,Shepherds of Good Hope,Oakvile,Elderly,570
+2018,5,Covenant House,Oakvile,Women,691
+2022,4,CAIRD,Mississauga,Youth,335
+2012,8,Salvation Army,Oakvile,Men,323
+2012,8,YMCA,Oakvile,Men,396
+2003,4,YMCA,Mississauga,Elderly,871
+2017,10,Covenant House,Whitby,Elderly,448
+2013,8,Shepherds of Good Hope,Whitby,Indigenous,549
+2012,5,YMCA,Mississauga,Elderly,403
+2006,10,Covenant House,Mississauga,Elderly,291
+2015,6,CAIRD,Oakvile,Youth,159
+2018,5,Kennedy House Youth Services,Mississauga,Women,182
+2002,7,Kennedy House Youth Services,Toronto,Men,720
+2008,5,CAIRD,Whitby,Men,184
+2016,3,YMCA,Scarborough,Elderly,602
+2011,7,CAIRD,Toronto,Youth,542
+2019,1,Kennedy House Youth Services,Whitby,Elderly,865
+2003,6,YMCA,Toronto,Men,749
+2008,6,Kennedy House Youth Services,Toronto,Indigenous,684
+2018,8,CAIRD,Scarborough,Women,269
+2000,10,Shepherds of Good Hope,Oakvile,Men,335
+2011,9,Salvation Army,Toronto,Men,861
+2011,4,YMCA,Mississauga,Youth,322
+2021,8,Kennedy House Youth Services,Oakvile,Youth,198
+2023,5,CAIRD,Toronto,Youth,722
+2016,3,CAIRD,Scarborough,Elderly,749
+2013,5,YMCA,Whitby,Men,153
+2010,5,Kennedy House Youth Services,Toronto,Indigenous,506
+2003,11,YMCA,Whitby,Youth,707
+2012,4,Covenant House,Toronto,Women,950
+2003,6,CAIRD,Oakvile,Women,407
+2006,10,Covenant House,Whitby,Indigenous,519
+2015,1,YMCA,Oakvile,Women,575
+2011,8,CAIRD,Toronto,Indigenous,511
+2017,10,YMCA,Whitby,Men,565
+2018,7,CAIRD,Whitby,Men,779
+2018,8,Kennedy House Youth Services,Scarborough,Youth,343
+2011,7,YMCA,Toronto,Indigenous,483
+2017,7,Shepherds of Good Hope,Toronto,Elderly,852
+2022,4,Shepherds of Good Hope,Mississauga,Women,153
+2007,1,Salvation Army,Whitby,Men,915
+2007,10,Covenant House,Mississauga,Elderly,734
+2015,11,Salvation Army,Mississauga,Youth,260
+2007,8,YMCA,Oakvile,Elderly,623
+2003,3,CAIRD,Mississauga,Youth,717
+2018,10,CAIRD,Mississauga,Indigenous,439
+2005,11,Covenant House,Whitby,Youth,891
+2012,2,Salvation Army,Oakvile,Indigenous,760
+2012,7,Kennedy House Youth Services,Scarborough,Men,600
+2009,7,YMCA,Oakvile,Youth,248
+2021,1,Salvation Army,Toronto,Youth,107
+2000,3,Kennedy House Youth Services,Whitby,Men,352
+2015,6,YMCA,Mississauga,Elderly,275
+2004,10,Covenant House,Oakvile,Men,216
+2009,1,YMCA,Scarborough,Men,515
+2014,7,CAIRD,Oakvile,Indigenous,196
+2018,11,Covenant House,Whitby,Youth,510
+2012,7,Covenant House,Whitby,Elderly,605
+2001,10,Kennedy House Youth Services,Oakvile,Youth,143
+2014,4,CAIRD,Whitby,Indigenous,719
+2000,8,Salvation Army,Scarborough,Women,924
+2014,6,Covenant House,Mississauga,Men,609
+2012,9,YMCA,Scarborough,Elderly,137
+2008,10,Salvation Army,Mississauga,Men,274
+2018,2,Salvation Army,Oakvile,Elderly,454
+2005,3,Salvation Army,Toronto,Indigenous,399
+2001,8,YMCA,Whitby,Elderly,704
+2020,9,Salvation Army,Toronto,Elderly,520
+2022,7,Salvation Army,Scarborough,Men,301
+2021,9,Salvation Army,Scarborough,Elderly,539
+2019,1,YMCA,Whitby,Women,919
+2007,6,Kennedy House Youth Services,Toronto,Indigenous,477
+2019,10,Salvation Army,Toronto,Men,324
+2002,5,CAIRD,Mississauga,Women,885
+2000,6,YMCA,Toronto,Indigenous,671
+2015,1,Kennedy House Youth Services,Toronto,Youth,976
+2022,4,CAIRD,Mississauga,Indigenous,669
+2009,3,Shepherds of Good Hope,Mississauga,Elderly,115
+2001,11,Covenant House,Toronto,Indigenous,598
+2016,11,Salvation Army,Toronto,Indigenous,472
+2019,10,CAIRD,Toronto,Elderly,612
+2019,7,Covenant House,Oakvile,Women,431
+2018,3,YMCA,Whitby,Indigenous,938
+2019,8,Covenant House,Oakvile,Men,727
+2006,10,Kennedy House Youth Services,Oakvile,Men,443
+2022,1,CAIRD,Oakvile,Men,742
+2001,8,CAIRD,Scarborough,Women,668
+2020,10,Shepherds of Good Hope,Mississauga,Youth,470
+2001,6,Shepherds of Good Hope,Toronto,Elderly,501
+2000,3,YMCA,Mississauga,Youth,697
+2013,6,Covenant House,Oakvile,Women,444
+2017,8,Kennedy House Youth Services,Mississauga,Men,114
+2011,2,Salvation Army,Scarborough,Elderly,653
+2013,10,CAIRD,Oakvile,Elderly,145
+2012,4,YMCA,Mississauga,Women,794
+2007,1,Salvation Army,Scarborough,Men,560
+2022,6,CAIRD,Oakvile,Elderly,616
+2009,8,YMCA,Mississauga,Youth,992
+2011,4,Kennedy House Youth Services,Scarborough,Women,367
+2020,2,YMCA,Oakvile,Women,253
+2004,10,Covenant House,Oakvile,Youth,120
+2006,8,Salvation Army,Oakvile,Youth,898
+2012,2,Covenant House,Mississauga,Indigenous,356
+2021,7,Salvation Army,Toronto,Youth,887
+2008,3,Kennedy House Youth Services,Toronto,Men,818
+2022,9,Shepherds of Good Hope,Mississauga,Elderly,394
+2001,4,Shepherds of Good Hope,Scarborough,Youth,664
+2001,7,CAIRD,Mississauga,Youth,490
+2016,7,CAIRD,Mississauga,Elderly,150
+2023,2,Shepherds of Good Hope,Scarborough,Elderly,196
+2005,11,Shepherds of Good Hope,Oakvile,Youth,489
+2009,10,CAIRD,Mississauga,Indigenous,660
+2012,5,Salvation Army,Whitby,Women,749
+2016,6,Shepherds of Good Hope,Mississauga,Youth,364
+2021,8,Covenant House,Mississauga,Indigenous,698
+2004,11,YMCA,Toronto,Women,931
+2001,11,Kennedy House Youth Services,Oakvile,Youth,420
+2019,5,Covenant House,Scarborough,Women,419
+2006,9,Shepherds of Good Hope,Mississauga,Youth,646
+2012,4,Salvation Army,Toronto,Men,147
+2014,6,Shepherds of Good Hope,Oakvile,Youth,232
+2007,1,YMCA,Oakvile,Men,388
+2011,10,Kennedy House Youth Services,Scarborough,Indigenous,195
+2008,7,Shepherds of Good Hope,Oakvile,Men,162
+2018,11,Covenant House,Mississauga,Men,824
+2012,11,Covenant House,Mississauga,Youth,463
+2005,4,Shepherds of Good Hope,Mississauga,Youth,994
+2009,11,Salvation Army,Mississauga,Women,786
+2006,10,Shepherds of Good Hope,Mississauga,Women,629
+2020,2,Shepherds of Good Hope,Toronto,Women,242
+2018,3,CAIRD,Whitby,Youth,200
+2022,8,Shepherds of Good Hope,Toronto,Elderly,287
+2000,9,CAIRD,Toronto,Men,838
+2019,3,YMCA,Whitby,Indigenous,747
+2016,6,Salvation Army,Scarborough,Youth,274
+2018,9,Salvation Army,Mississauga,Youth,371
+2010,11,Covenant House,Oakvile,Youth,356
+2011,9,Salvation Army,Mississauga,Elderly,582
+2018,2,Shepherds of Good Hope,Scarborough,Men,688
+2008,10,Shepherds of Good Hope,Scarborough,Men,291
+2010,11,YMCA,Mississauga,Youth,451
+2020,4,YMCA,Oakvile,Indigenous,759
+2019,7,Kennedy House Youth Services,Mississauga,Women,385
+2017,7,Salvation Army,Mississauga,Women,587
+2010,4,Kennedy House Youth Services,Whitby,Elderly,322
+2014,5,Salvation Army,Scarborough,Men,786
+2015,8,CAIRD,Oakvile,Women,891
+2010,10,Shepherds of Good Hope,Mississauga,Men,256
+2010,1,Salvation Army,Mississauga,Indigenous,802
+2006,11,Shepherds of Good Hope,Oakvile,Youth,116
+2008,7,Covenant House,Oakvile,Indigenous,980
+2009,8,Salvation Army,Oakvile,Youth,128
+2021,2,Covenant House,Oakvile,Youth,279
+2007,9,YMCA,Toronto,Indigenous,729
+2015,4,YMCA,Scarborough,Women,134
+2023,5,Shepherds of Good Hope,Scarborough,Men,249
+2007,3,Salvation Army,Mississauga,Elderly,320
+2021,4,Salvation Army,Toronto,Men,458
+2003,4,YMCA,Toronto,Youth,829
+2013,2,Salvation Army,Toronto,Elderly,297
+2011,1,Salvation Army,Whitby,Women,709
+2023,5,Kennedy House Youth Services,Oakvile,Men,933
+2019,11,Salvation Army,Whitby,Youth,912
