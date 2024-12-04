@@ -1,14 +1,14 @@
 ---
-title: "My title"
-subtitle: "My subtitle if needed"
+title: "Quantifying Shelter Usage: Understanding The Toronto Demographic Seeking Shelter Services"
+subtitle: "A Data-Driven Analysis of Shelter Demands by Population and Service Type"
 author: 
-  - First author
-  - Another author
-thanks: "Code and data are available at: [https://github.com/RohanAlexander/starter_folder](https://github.com/RohanAlexander/starter_folder)."
+  - Aakash Vaithyanathan
+thanks: "Code and data is available at: [https://github.com/aakash2002/quantitative-analysis-canadian-shelters](https://github.com/aakash2002/quantitative-analysis-canadian-shelters)."
 date: today
 date-format: long
-abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+abstract: "This paper aims to study the various factors that influence the daily service count of demographics that seek shelter services across Toronto. By examining the demographics, the type of shelter and the various services it offers, we hope to better understand the key factors that influence these shelter service count. Our study utilizes a negative binomial model to estimate the daily count accurately. Our study finds that the most popular demographic that tend to shelters is Men with the primary shelter type being an emergency shelter offering short term stay. We believe the results from this study can help us in understanding the key factors that influence the shelter service count and provide valuable information in better supporting shelters and developing policies to improve the homelessness situation in Toronto."
 format: pdf
+toc: true
 number-sections: true
 bibliography: references.bib
 ---
@@ -19,241 +19,807 @@ bibliography: references.bib
 #| message: false
 
 library(tidyverse)
-library(palmerpenguins)
+library(scales)
+library(arrow)
+library(knitr)
+library(ggplot2)
+library(rstanarm)
+library(caret)
+library(loo)
+library(broom.mixed)
+library(modelsummary)
+library(kableExtra)
+library(gridExtra)
 ```
 
 
-# Introduction
+# Introduction {#intro-sec}
 
-Overview paragraph
+Homeless Shelters are the backbone support system to the growing problem of homelessness in Toronto and other parts of Canada. In 2023, the City of Toronto declared homelessness as a significant emergency that needs immediate attention [@homelessnessAsEmergency]. Aside form not being able to afford proper meals, or a roof over their heads, the homeless population also are at increased risk of health concerns due to compromised immune systems and lack of hygienic circumstances either on the streets or at crowded shelters that they call home. Since 2018, there have been an increase of over 24% to visits to non-emergent ERs by the homeless people [@growthOfHomelessness]. Before more policies and findings are allocated to address this problem, it is important to understand the population that most experiences this issue and what factors play a key contributing role.
 
-Estimand paragraph
+This study estimates the daily number of service counts in shelters by examining the demographic group, the type of shelter and the services it offers. By analyzing these relationships, the study evaluates how changes in these predictors affect daily shelter service count and what factors play a key role in determining this count. The research question this paper aims to answer is: "What factors influence the types of shelters that various population demographics seek in various shelters across Toronto". To help answer this question, we use a Negative Binomial Model with interaction terms between the demographics and the shelter type in order to better understand the combined effect of these factors. This choice of model allows us to accurately model the daily count based data that we are interested in estimating in this study.
 
-Results paragraph
+Our findings suggest that Men are the majority group that tend to shelter services with Emergency based shelters being their primary shelter type. These type of shelters allow individuals to stay for a short duration of about a month and allow re-admissions at a later date. In addition, as of November 2024, we our study identified Emergency based shelters as the most popular shelters with increasing population at these centers. Our study highlights the need for addressing these issues before any potential health outbreaks occur at these populous shelters.
 
-Why it matters paragraph
+The remainder of this paper is structured as follows: The [data](#data-sec) discusses the data set used in the study, appropriate cleaning steps carried out and brief overview of the measurements. The [model](#model-sec) describes the details of the model used in this study and a justification for our choice. It also highlights the limitation of our proposed model. The [results](#result-sec) presents the our findings in this study and what it means. We then discuss these findings in detail under the [discussion](#discussion-sec) section and conclude our study with some identified [limitation](#limitation-sec) and proposed [future steps](#future-steps-sec).
 
-Telegraphing paragraph: The remainder of this paper is structured as follows. @sec-data....
+# Data {#data-sec}
 
+## Overview {#data-overview}
 
+In order to understand the factors influencing how many people seek shelter services, we decided to use the data provided by Open Data Toronto [@opendatatoronto]. The data set is maintained and published by Toronto Shelter & Support Services [@shelterServiceDataset] under the Open Government License - Toronto. The data set contains information regarding the various shelter types across Toronto offering different types of overnight shelter services along with the daily count and the demographic of the population. In addition, it also includes information about the type of capacity it offers which is either a bed based or room based service. The data set also contains daily statistics about the available funding beds/rooms, the current used beds/rooms and the rate of occupancy of beds/rooms. Each row also specifies the date when it was collected.
 
+Since the data supports both bed based and room based shelter services, rows of data that specific bed based shelter details won't include any data for room based services. As a result, our data will only contain information for one of the following types. To address this, we decided to focus on the bed based shelter capacity in our study. The motivation for why is because a key factor we're interested in studying is the trends in the various demographic groups that seek shelter services and room based shelter services are primarily focused towards families or couples [@shelterUsageType] which may skew our analysis.
 
+This data set is updated daily and has the following supported formats: CSV, JSON and XML. It includes data between the year 2021 to 2024. In our study, we decided to use the 2024 data set which includes the daily shelter service information from January 1, 2024 to November 26, 2024.
 
+Alternatively, another data set that could have been used is the Toronto Shelter System Flow [@torontoShelterSystemFlowDataset] that is also maintained and published by Toronto Shelter & Support Services under the Open Government License - Toronto. The reason why this data set was not chosen is because it primarily focuses on the the count based data of various groups and doesn't contain categorical details into the shelter types and services that are necessary for this study.
 
-# Data {#sec-data}
+A sample of the cleaned data set is described in @tbl-sample-rows-cleaned.
 
-## Overview
+```{r, message = FALSE, echo = FALSE}
+#| label: tbl-sample-rows-cleaned
+#| tbl-cap: "Sample rows from Cleaned Toronto Shelter Service Data"
+ data <- read_parquet(here::here("data/02-analysis_data/analysis_shelter_service.parquet"))
+ head(data, 5) |>
+     kable(col.names = c("Demographic", "Shelter Type", "Service Type", "Service Count"))
+```
 
-We use the statistical programming language R [@citeR].... Our data [@shelter].... Following @tellingstories, we consider...
-
-Overview text
+The data set contains 44300 observations and after removing room based shelter observations and any missing values we are left with 31484 data points for analysis. The process of cleaning the data was done using the R [@citeR] and Janitor [@janitor] package. The key steps taken in data cleaning includes standardizing column names to only contain lower case letters and underscores. Next, we select the rows of data that correspond bed based capacity. Following this, we select the desired columns for our study and remove all missing values. Since the independent variables include categorical types, we convert these to factors and rename the variables to be less ambiguous. As mentioned previously, a key factor we're interested in observing is the role of demographic group in the count of users seeking shelter services. Therefore, we re-level our data to use 'Men' as our point of reference for comparison. Finally, we save our data as a parquet file, compressing the file size significantly using the Arrow [@citeArrow] package. In addition to saving the cleaned data set, we also split our data into training and testing set for analysis by the statistical models we later build in this study. This is done using the Caret [@citeCaret] package. The training and testing data set parquet files are also saved. All the graphs shown in the dataset are made using `ggplot2` [@ggplot2] package. All the tables in this study are created using `kable` [@citeKnitr].
 
 ## Measurement
-	
-Some paragraphs about how we go from a phenomena in the world to an entry in the dataset.
 
-## Outcome variables
+This data set outlines daily list of active overnight shelter services part of the Shelter Management Information System (SMIS) database under Toronto Shelter and Support Services. The daily entries recorded by various shelters across Toronto are connected to the SMIS database and reflected in it's system by 4 AM every day except for weekends. As of April 23, 2024, hotel-based overnight service types that is prioritized towards refugee claimants and operated by the Canadian Red Cross Society [@canadianRedCross] is also included in this data set. However, since our study focuses on the bed based service types, during the above described data cleaning process, these data points will not be included. Nonetheless, it is important to acknowledge this as it highlights the coverage of this data set and more accurately reflects the various shelter systems available in Toronto.
 
-Add graphs, tables and text. Use sub-sub-headings for each outcome variable or update the subheading to be singular.
+Each shelter system records the details of the daily overnight service that it offers. The daily service count in the shelter is the total count for the recorded day and is stored as an integer in the data set. Categorical fields like service type, shelter type, demographic are stored as character type in the data set. Each row is representative of the daily service unique to the specific demographic, service type and shelter type along with the date when it was recorded into the system. Each shelter also includes a unique shelter ID and an organization ID for easy identification. It is important to keep in mind that since the SMIS database is updated at 4 AM the following data, at any given point in time, the data set may not be indicative of the current state of the services offered by various shelters.
 
 
+## Outcome variable — Service Count
 
-Some of our data is of penguins (@fig-bills), from @palmerpenguins.
+The service count attribute represents the total count of individuals that seek overnight shelter services for the given day. This information is made available from the data set and gives an overview of the daily service workload across shelters. @fig-freq-service-count-by-demographic describes the distribution of the service count by various demographic groups. @fig-freq-service-count-by-shelter-type describes the distribution of the service count by shelter types across Toronto and @fig-freq-service-count-by-service-type describes the distribution of the service count by the various overnight services that shelters in Toronto offer.
 
-```{r}
-#| label: fig-bills
-#| fig-cap: Bills of penguins
-#| echo: false
+```{r, message = FALSE, echo = FALSE}
+#| label: fig-freq-service-count-by-demographic
+#| fig-cap: "Distribution Shelter Service Count by Demographic for the year 2024"
 
-ggplot(penguins, aes(x = island, fill = species)) +
-  geom_bar(alpha = 0.8) +
-  scale_fill_manual(values = c("darkorange","purple","cyan4"),
-                    guide = "none") +
+# Aggregate data to calculate total service counts for each demographic group
+freq_data <- data |> 
+  select(service_count, demographic) |>
+  group_by(demographic) |>
+  summarise(total_service_count = sum(service_count)) |>
+  mutate(percentage = (total_service_count / sum(total_service_count)) * 100)
+
+# Create the bar graph
+ggplot(freq_data, aes(x = demographic, y = total_service_count, fill = demographic)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  geom_text(aes(label = paste0(round(percentage, 1), "%")), 
+            vjust = -0.5, size = 4) +
+  labs(
+    title = "Frequency Bar Graph by Demographic",
+    x = "Demographic Groups",
+    y = "Annual Service Count"
+  ) +
+  expand_limits(y = max(freq_data$total_service_count) * 1.1) +  # Add space above bars
+  scale_y_continuous(labels = comma) +  # Format y-axis labels
   theme_minimal() +
-  facet_wrap(~species, ncol = 1) +
-  coord_flip()
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5, size = 14)
+  )
+
 ```
 
-Talk more about it.
+```{r, message = FALSE, echo = FALSE}
+#| label: fig-freq-service-count-by-shelter-type
+#| fig-cap: "Distribution Shelter Service Count by Shelter Type for the year 2024"
 
-And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
+# Aggregate data to calculate total service counts for each demographic group
+freq_data <- data |> 
+  select(service_count, shelter_type) |>
+  group_by(shelter_type) |>
+  summarise(total_service_count = sum(service_count)) |>
+  mutate(percentage = (total_service_count / sum(total_service_count)) * 100)
 
-```{r}
-#| label: fig-planes
-#| fig-cap: Relationship between wing length and width
-#| echo: false
-#| warning: false
-#| message: false
-
-analysis_data <- read_csv(here::here("data/02-analysis_data/analysis_data.csv"))
-
-analysis_data |> 
-  ggplot(aes(x = width, y = length)) +
-  geom_point(alpha = 0.8) +
+# Create the bar graph
+ggplot(freq_data, aes(x = shelter_type, y = total_service_count, fill = shelter_type)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  geom_text(aes(label = paste0(round(percentage, 1), "%")), 
+            vjust = -0.5, size = 2) +
+  labs(
+    title = "Frequency Bar Graph by Shelter Types",
+    x = "Shelter Types",
+    y = "Annual Service Count"
+  ) +
+  expand_limits(y = max(freq_data$total_service_count) * 1.1) +  # Add space above bars
+  scale_y_continuous(labels = comma) +  # Format y-axis labels
   theme_minimal() +
-  labs(x = "Wing width (mm)",
-       y = "Wing length (mm)")
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5, size = 14)
+  )
+
 ```
 
-Talk way more about it. 
+```{r, message = FALSE, echo = FALSE}
+#| label: fig-freq-service-count-by-service-type
+#| fig-cap: "Distribution Shelter Service Count by Service Type for the year 2024"
+
+# Aggregate data to calculate total service counts for each demographic group
+freq_data <- data |> 
+  select(service_count, service_type) |>
+  group_by(service_type) |>
+  summarise(total_service_count = sum(service_count)) |>
+  mutate(percentage = (total_service_count / sum(total_service_count)) * 100)
+
+# Create the bar graph
+ggplot(freq_data, aes(x = service_type, y = total_service_count, fill = service_type)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  geom_text(aes(label = paste0(round(percentage, 1), "%")), 
+            vjust = -0.5, size = 2) +
+  labs(
+    title = "Frequency Bar Graph by Service Types",
+    x = "Service Types",
+    y = "Annual Service Count"
+  ) +
+  expand_limits(y = max(freq_data$total_service_count) * 1.1) +  # Add space above bars
+  scale_y_continuous(labels = comma) +  # Format y-axis labels
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 0.85),
+    plot.title = element_text(hjust = 0.5, size = 14)  # Center and increase title size
+  )
+
+```
+
 
 ## Predictor variables
 
-Add graphs, tables and text.
+### Demographic
 
-Use sub-sub-headings for each outcome variable and feel free to combine a few into one if they go together naturally.
-
-
+The demographic attribute specifies the population group seeking shelter service. In our data set, we have Men, Women, Mixed Adults and Youth as the demographic groups. It is important to note that 'Families' is another possible demographic group. However, as mentioned in the [data overview ](#data-sec) section, our study focuses on the bed based shelter services and families are primarily part of the room based services. Hence, the cleaned data doesn't represent this demographic group. Furthermore, the 'Mixed Adult' group represents any gender identify individual seeking shelter service. @fig-freq-by-demographic shows the distribution of each group in our data set. 
 
 
+```{r, message = FALSE, echo = FALSE}
+#| label: fig-freq-by-demographic
+#| fig-cap: "Distribution of demographic groups seeking shelter services for the year 2024"
+
+# Count the distribution and calculate percentages
+freq_data <- data |> 
+  select(demographic) |> 
+  group_by(demographic) |> 
+  summarise(count = n()) |> 
+  mutate(percentage = (count / sum(count)) * 100)
+
+# Create the graph with percentages displayed
+ggplot(freq_data, aes(x = demographic, y = count, fill = demographic)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  geom_text(aes(label = paste0(round(percentage, 1), "%")), 
+            vjust = -0.5, size = 2.5) + # Add percentage labels above the bars
+  labs(
+    title = "Distribution of Demographic Groups",
+    x = "Demographic Group",
+    y = "Count"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 0.85),
+    plot.title = element_text(hjust = 0.5, size = 12)  # Center and increase title size
+  )
+
+```
+
+### Shelter Service Type
+
+The shelter service type attribute specifies the overnight service the specific shelter offers. The data set contains 8 distinct types of services offered by various shelters. In our study, since we are focused on the bed based service, 'Motel/Hotel' type of shelters won't be included in our cleaned data set. Furthermore, since the data set is for the year 2024, our cleaned data set does not appear to contain any observations of shelters that offer COIVD-19 recovery sites. @fig-freq-by-service-type shows the distribution of each shelter type in our data set. 
+
+```{r, message = FALSE, echo = FALSE}
+#| label: fig-freq-by-service-type
+#| fig-cap: "Distribution of shelter service types offered for the year 2024"
+
+# Count the distribution and calculate percentages
+freq_data <- data |> 
+  select(service_type) |> 
+  group_by(service_type) |> 
+  summarise(count = n()) |> 
+  mutate(percentage = (count / sum(count)) * 100)
+
+# Create the graph with percentages displayed
+ggplot(freq_data, aes(x = service_type, y = count, fill = service_type)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  geom_text(aes(label = paste0(round(percentage, 1), "%")), 
+            vjust = -0.5, size = 2) + # Add percentage labels above the bars
+  labs(
+    title = "Distribution of Service Types",
+    x = "Service Types",
+    y = "Count"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 0.85),
+    plot.title = element_text(hjust = 0.5, size = 14)  # Center and increase title size
+  )
+
+```
+
+### Shelter Types
+
+The shelter type attribute specifies the type of the shelter operated in Toronto. In our data set, we have Emergency and Transitional as the available shelter types. Emergency shelters are intended for individuals seeking short term stay before returning to their permanent housing. Transitional shelters are indented for individuals seeking long term stay until they are able to address their specific housing needs. This type of shelter requires a referral from an emergency shelter before accommodating anyone. @fig-freq-by-shelter-type shows the distribution of each shelter type in our data set.
+
+```{r, message = FALSE, echo = FALSE}
+#| label: fig-freq-by-shelter-type
+#| fig-cap: "Distribution of shelter types for the year 2024"
+
+# Count the distribution and calculate percentages
+freq_data <- data |> 
+  select(shelter_type) |> 
+  group_by(shelter_type) |> 
+  summarise(count = n()) |> 
+  mutate(percentage = (count / sum(count)) * 100)
+
+# Create the graph with percentages displayed
+ggplot(freq_data, aes(x = shelter_type, y = count, fill = shelter_type)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  geom_text(aes(label = paste0(round(percentage, 1), "%")), 
+            vjust = -0.5, size = 2) + # Add percentage labels above the bars
+  labs(
+    title = "Distribution of Shelter Types",
+    x = "Shelter Types",
+    y = "Count"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 0.85),
+    plot.title = element_text(hjust = 0.5, size = 14)  # Center and increase title size
+  )
+
+```
+
+# Model {#model-sec}
+
+## Model overview
+
+In order to study the count of people seeking shelter services, we decided to build a negative binomial regression framework. Since in our study, we are interested in understanding the count of people, a regression model is preferred. The reason for why a negative binomial model is chosen over other alternatives such as poisson model which is also used to model count is due to the nature of the data distribution. From @tbl-summary-stat-service-count, we can see that our variance is significantly larger than our mean. When this happens, we say that there exist overdispersion in our data set [@citeRohan]. The poisson model assumes equal mean and variance which is clearly not true for our data set. Hence, using a poisson model would significantly under fit our data. Furthermore, a linear regression model isn't a viable option either since it's used for modeling continuous data where as we are interested in modeling the count data for specific predictor variables. Thus, we have chosen the negative binomial regression model as our chosen model for this study as these are specifically designed to model count data with overdispersion making them appropriate for our situation.
+
+```{r, message = FALSE, echo = FALSE}
+#| label: tbl-summary-stat-service-count
+#| tbl-cap: "Summary Statistics of Shelter Service Count"
+mean_service_count <- mean(data$service_count)
+var_service_count <- var(data$service_count)
+ 
+# Create a data frame for the statistics
+stats_data <- data.frame(
+  Statistic = c("Mean", "Variance"),
+  Value = c(mean_service_count, var_service_count)
+)
+
+# Generate a table using knitr::kable()
+kable(stats_data, 
+      col.names = c("Statistic", "Value"), 
+      caption = "Summary Statistics of Shelter Service Count"
+      ) |>
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
+```
 
 
+## Model setup
 
-
-# Model
-
-The goal of our modelling strategy is twofold. Firstly,...
-
-Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix -@sec-model-details].
-
-## Model set-up
-
-Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.  
+The setup for the Negative Binomial Regression model is as follows:
 
 \begin{align} 
-y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
-\mu_i &= \alpha + \beta_i + \gamma_i\\
-\alpha &\sim \mbox{Normal}(0, 2.5) \\
-\beta &\sim \mbox{Normal}(0, 2.5) \\
-\gamma &\sim \mbox{Normal}(0, 2.5) \\
-\sigma &\sim \mbox{Exponential}(1)
+y_i | \lambda_i &\sim \text{Negative Binomial}(\lambda_i, \phi) \\
+\log(\lambda_i) &= \beta_0 + \beta_1 \times \text{demographic}_i \times \text{shelter\_type}_i + \beta_2 \times \text{service\_type}_i \\
+where, \\
+\beta_1 &\sim \text{Normal(0, 2.5)} \\
+\beta_2 &\sim \text{Normal(0, 2.5)} \\
+\phi &\sim \text{Exponential}(1) \\
 \end{align}
 
-We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
+In the above model:
+
+- $\lambda_i$ is the expected $(service\_count)_{i}$, modeled through a log link function.
+- $\beta_0$ is the intercept term which denotes the count when all coefficients are 0.
+- $\beta_1$ is the coefficient for the interaction term **demographic** and **shelter type**.
+- $\beta_2$ is the coefficient for the **service type**.
+- $\phi$ is the **dispersion parameter** that controls the degree of overdispersion in the negative binomial distribution.
+
+All coefficients ($\beta_0, \beta_1, \beta_2$) are assigned the default prior of $Normal(0, 2.5)$ from the `rstanarm` package [@rstanarm]. This choice of priors are called weakly informative priors and are designed to stabilize computation offering moderate regularization. This allows the coefficients to scale naturally to the variability in the data.
+
+The prior distribution used for $\phi$, the overdispersion parameter is $Exponential(1)$. By including this distribution, we specify that our data includes overdispersion and allow the model to adjust for the data variability. Alternative distributions that were experimented were $Exponential(2)$ and $Exponential(0.5)$ to control the degree of variability allowed by the model. However, we found there was no significant difference between the distributions and decided to proceed with $Exponential(1)$ for our model setup. 
+
+All the predictor variables are categorical in our model and are converted to factors during the data cleaning process. Since we know categorical variables have a distinct set of values that they take in our data set, by converting them to factors, we assign each of them an integer value to take [@factorExplanation]. This allows them to be represented as integers when fitting our above described model.
 
 
-### Model justification
+## Model selection
 
-We expect a positive relationship between the size of the wings and time spent aloft. In particular...
+As discussed above, due to the presence of overdispersion in our data set, we decided to choose the negative binomial model over the poisson model. For our model selection process, we built a total of three bayesian models. The first is the poission model and the other two are negative binomial models. One of the negative binomial model includes an interaction term between demographic and shelter type to explore whether there is a relationship between the type of shelters the population tends to seek. 
 
-We can use maths by including latex between dollar signs, for instance $\theta$.
+From the above section, in addition to checking for the presence of overdispersion, we also compared the three models predictive power. This is done using the Leave-One-Out Cross Validation (LOO) Comparison method. The LOO comparison allows us to compare the Expected Log Pointwise Predictive Density (ELPD) between each of the models and identify which model has the best predictive power. The model with its ELPD difference closest to 0 is the model with best predictive power [@citeRohan]. We use the `loo_compare()` function using the `rstanarm` package to compare the ELPD of the above three models. This function creates a matrix of the three models and returns the pairwise ELPD difference between each. The best model is output at the top of the matrix and will always have it's ELPD difference as 0 [@citeLoo]. From @tbl-compare-models-loo, we can see that our negative binomial model with interaction has the best predictive capabilities while address the overdispersion that exists in our data set. Therefore, we have decided to use this model in our study.
 
+## Model diagnostics and validation
 
-# Results
+Aside from performing the LOO comparison on the above models, we also asses their actual predictive power and variability. The two metrics we use for this is calculating the Mean Absolute Error (MAE) and Root Mean Squared Error (RMSE) for our models. During the data cleaning steps outlined in [data overview](#data-sec) section, we mentioned that we split our data set into training and testing set using the caret package [@citeCaret]. Since we have sufficient data points in our study, by using an 80-20 split, we were able to have sufficient training and test data. Each of the described models is fitted on the training data and the diagnostics are evaluated on the testing data. From @tbl-compare-models-mae, we observe that the negative binomial model without interaction had the least MAE of the three models. However, the difference between each of the three models is negligible. Similarly from @tbl-compare-models-rmse, we observe that the negative binomial model with interaction has the least RMSE of all models however the difference between them is negligible. It is important to understand what these statistics mean. MAE measures the absolute difference in errors between the actual and predicted service count without addressing any outliers that may exist in our study. For our model, the difference in predicted and actual service count is about 25 people. The RMSE calculates the square root of the averaged errors between the predicted and actual data. The presence of outliers can impact the calculated error value as the squared difference between the predicted and actual observations can be large. In our model, the negative binomial model with interaction has an RMSE of about 40.
 
-Our results are summarized in @tbl-modelresults.
+A key limitation in the model is the significant over dispersion that exists along with any potential outliers in our data set. These results explain why our model demonstrates a high MAE and RMSE statistics. However, we cannot conclude on the models predictive power simply by observing the MAE and RMSE and must explore other diagnostics methods to determine the models predictive power. @fig-ppcheck-each-model outlines the predictive power of each of the three model by plotting the posterior predictive check. 
 
-```{r}
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
+By observing these diagnostics methods, we conclude that our negative binomial model with interaction is the optimal explanatory model to use for the purposes of our study.
 
-library(rstanarm)
+Additional model convergence plots using Markov Chain Monte Carlo algorithm, $\hat{R}$ plot for model estimates, and other diagnostic plots like Pareto K, QQ-Plot and Residual Plot for the explanatory model is specified in the [appendix](#appendix-sec) section of the report.
 
-first_model <-
-  readRDS(file = here::here("models/first_model.rds"))
-```
+```{r, message = FALSE, echo = FALSE}
+#| label: tbl-compare-models-mae
+#| tbl-cap: "Comparison of Mean Absolute Error (MAE) for Poisson and Two Negative Binomial Models"
 
-```{r}
-#| echo: false
-#| eval: true
-#| label: tbl-modelresults
-#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
-#| warning: false
+# Define a function to calculate MAE
+calculate_mae <- function(model, data) {
+  predictions <- posterior_predict(model, newdata = data) %>% 
+    apply(2, mean)  # Take mean of posterior predictions
+  actuals <- data$service_count
+  mean(abs(predictions - actuals))  # Compute MAE
+}
 
-modelsummary::modelsummary(
-  list(
-    "First model" = first_model
-  ),
-  statistic = "mad",
-  fmt = 2
+# Load the saved models
+poisson_model <- readRDS(here::here("models/poisson_model.rds"))
+neg_binomial_model_basic <- readRDS(here::here("models/neg_binomial_model_basic.rds"))
+neg_binomial_model_interaction <- readRDS(here::here("models/neg_binomial_model_interaction.rds"))
+
+test_data <- read_parquet(here::here("data/02-analysis_data/analysis_test_shelter_service.parquet"))
+
+# Calculate MAE for each model
+mae_poisson <- calculate_mae(poisson_model, test_data)
+mae_neg_binomial_basic <- calculate_mae(neg_binomial_model_basic, test_data)
+mae_neg_binomial_interaction <- calculate_mae(neg_binomial_model_interaction, test_data)
+
+# Create a comparison table
+mae_table <- tibble(
+  Model = c("Poisson Model", "Negative Binomial (Basic)", "Negative Binomial (Interaction)"),
+  MAE = c(mae_poisson, mae_neg_binomial_basic, mae_neg_binomial_interaction)
 )
+
+# Create a pretty kable table
+mae_table %>%
+  kable(caption = "Model Comparison: Mean Absolute Error (MAE)") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
+  column_spec(2)
+
+```
+
+```{r, message = FALSE, echo = FALSE}
+#| label: tbl-compare-models-rmse
+#| tbl-cap: "Comparison of Root Mean Squared Error (RMSE) for Poisson and Two Negative Binomial Models"
+
+# Define a function to calculate RMSE
+calculate_rmse <- function(model, data) {
+  predictions <- posterior_predict(model, newdata = data) %>% 
+    apply(2, mean)  # Take mean of posterior predictions
+  actuals <- data$service_count
+  sqrt(mean((predictions - actuals)^2))  # Compute RMSE
+}
+
+# Calculate RMSE for each modelpi
+rmse_poisson <- calculate_rmse(poisson_model, test_data)
+rmse_neg_binomial_basic <- calculate_rmse(neg_binomial_model_basic, test_data)
+rmse_neg_binomial_interaction <- calculate_rmse(neg_binomial_model_interaction, test_data)
+
+# Create a comparison table
+rmse_table <- tibble(
+  Model = c("Poisson Model", "Negative Binomial (Basic)", "Negative Binomial (Interaction)"),
+  RMSE = c(rmse_poisson, rmse_neg_binomial_basic, rmse_neg_binomial_interaction)
+)
+
+# Create a pretty kable table
+rmse_table %>%
+  kable(caption = "Model Comparison: Root Mean Squared Error (RMSE)") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
+  column_spec(2)
 ```
 
 
+# Results {#result-sec}
+
+The key findings from our study are discussed in the below sections.
+
+## Model Summary
+The summary table of the model summary was generated using `modelsummary` [@citeModelSummary], `broom.mixed` [@citeBroomMixed] and `kableExtra` [@citeKableExtra] packages. In this study, one of the factors we are interested in exploring is the distribution of the various demographics that seek shelter services. For this purposes, as outlined in the data cleaning steps, we re-leveled our demographics column to use Men as the reference column. @tbl-summary-explanatory-model outlines the estimates for the various categorical values that influence the service counts in various shelters across Canada. The intercept term represents the service count for the day when the predictor variables are at the reference level. The model summary automatically selects the first appearing categorical factor value as the reference in our data set. However, since we have explicitly specified 'Men' as the reference level for demographic, the model selects this as the reference. Therefore in our model, our intercept has a value of 4.2 which means that when the demographic for the day is men, for a shelter that is an emergency type and offers 24 hour respite site overnight service, we have about approximately 5 service counts in that shelter for the day for the specific group.
 
 
-# Discussion
+## Credibility Intervals for Explanatory Model
 
-## First discussion point {#sec-first-point}
+In addition to the model summary, we can look at the credibility interval for our model which was constructed using the `broom` [@citeBroom] package. The 95% credibility interval outlines the probability of confidence that each predictor variable takes in our model. From @fig-credibility-interval, we can see that our intercept term that specifies the daily shelter service count for the day is positively correlated with the predictors in our model as it lies greater than 0 and has a value of about 4.25. 
 
-If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
+Since the credibility interval outlines the certainty of the estimates for various predictors, we can see that the model shows high uncertainty for "Alternative Space Protocol" and "Top Bunk Contingency Space" shelter service types. A possible explanation for this is because from @fig-freq-by-service-type, we know that these make up for about 2 % and 2.8 % of our data set distributions and lack of sufficient observations explains why the model has high variability in predicting these service types with certainty. Furthermore, we see that the model has moderately high uncertainty when estimating for Transitional shelter type. An equivalent justification can be made for this as from @fig-freq-by-shelter-type, we know that transitional shelter types make up for only 23.4 % of our observations so the model experiences some degree of uncertainty. For the rest of the predictors, the credibility interval is relatively small indicating that the model is certain in predicting the estimates and their effects on the daily service count.
 
-## Second discussion point
+From @tbl-summary-explanatory-model and @fig-credibility-interval, we can make the following key observations
 
-Please don't use these as sub-heading labels - change them to be what your point actually is.
+```{r, message = FALSE, echo = FALSE}
+#| label: "fig-credibility-interval"
+#| fig-cap: "95 percent credibility interval for coefficients"
+tidy_model <- tidy(neg_binomial_model_interaction, conf.int = TRUE, conf.level = 0.95)
+ 
+ggplot(tidy_model, aes(x = term, y = estimate, ymin = conf.low, ymax = conf.high)) +
+   geom_pointrange() +
+   coord_flip() +  
+   labs(
+     title = "95 % Credibility Interval for Explanatory Model",
+     x = "Predictor",
+     y = "Coefficient Estimate"
+   ) +
+   theme_minimal() +
+   theme(
+     axis.text.x = element_text(size = 8),
+     axis.text.y = element_text(size = 6),
+    plot.title = element_text(hjust = 0.5, size = 10)
+   ) + 
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 10))
+   
+```
 
-## Third discussion point
 
-## Weaknesses and next steps
+### Role of Demographics in daily shelter count
 
-Weaknesses and next steps should also be included.
+We observe that the "Men" demographic group is the most popular group that seeks daily overnight shelter services for the year 2024. Youth take up 39.5 % of daily shelter usage of men or equivalently, they have 60 % lower shelter usage than Men. Women take up about 67.64 % of shelter usage of men or equivalently have about 32% less shelter usage than men. Mixed Adult group takes up about 76% of the shelter usage of men or equivalently have about 24% lower rate of shelter usage compared to Men. These observations are in line with our findings from @fig-freq-service-count-by-demographic.
+
+### Role of Shelter Types in daily shelter count
+
+We observe that the "Emergency" shelter types is the most shelter type that offers overnight services for the year 2024. Transitional shelter types take up about 38% of daily shelter usage than that of the emergency shelter type or equivalently, have about 62% lower rate of daily shelter count than Emergency type. This observation is in line with our findings from @fig-freq-service-count-by-shelter-type.
+
+### Role of Overnight Service Type in daily shelter count
+
+We observe that the "Shelter" service type is the most populate service that people seek for the year 2024. Standard shelters are about 105 % of the daily shelter usage than a 24-hour respite shelter service type. This observation is in line with our findings from @fig-freq-service-count-by-service-type.
+
+
+# Discussion {#discussion-sec}
+
+## Why are men more likely to seek shelter services
+
+This study highlights that the demographic plays a key role in the type of population group that seek overnight shelter services. From our model, we estimate that Men are the most densely populated group that seek daily overnight shelter across Toronto. As of November 2024, over 600,000 people at various shelters across Toronto constitute Male gender which is 16% more than the Mixed Adult population group, 21.4 % more than the Women population and 31.1 % more than the Youth population group that seek shelter services. This finding is in line with a study conducted by Housing Infrastructure Canada [@torontoShelterTypes2022] in the year 2022 that highlighted that from 2020 to 2022, emergency shelters saw an increase in Men population by 17% while women and youth shelters saw a 5% and 17% increase respectively. The same organization conducted a follow up to this study the following year and highlight that Toronto made up for the largest increase in available beds in shelters of about 300 beds [@torontoShelterTypes2023].
+
+A key reason why men are more likely to seek shelter services than women is because the readmission of men into various shelters is a lot higher than women [@menShelterReadmission]. Emergency shelters are designed to house individuals for short term duration. This allows Men to move across various shelters and upon completing their stay in a shelter, readmit themselves in the future. Another reason for why men are the more dominant group is due to hidden homelessness. A study by Canada Mortgage Housing Corporation [@cmhcschlWomensHomelessness] highlights that women and youth are most likely to experience hidden homelessness. 
+
+This highlights the need for effective measures to improve the situation of shelter services across Canada and prioritizing the male population that may be unable to be referred to a transitional shelter and seek multiple readmission into emergency shelters.
+
+## Daily volume at Emergency shelter types
+
+Our study shows that as of November 2024, over 1.5 million people that reside in shelters utilize emergency based shelters. These shelters are designed to accommodate individuals for short term stay of traditionally less than a month. However, these shelters allow for self referrals and readmission which allow people to move around various shelters across Toronto. This is significant as it shows the intensity of usage of emergency based shelters and the volume of people that seek it. Due to the sheer volume of people, these types of shelters are unable to offer sufficient spacing between individual beds. This is problematic as it often means that these shelters are packed with people in close proximity to one another. This comes at a huge cost as these shelters are poised for breakout due to the lack of spacing among the people [@shelterSpacingConditions]. 
+
+It is important to note that our study does not consider the age groups of the population at these shelters and elderly people with compromised immune system can find themselves are an increased danger of contracting infections and other diseases. This calls for the need for adequate budgeting and allocation of resources to emergency shelters due to their high popularity among the shelter seeking community.
+
+## Need for improved infrastructure and services at standard shelters
+
+Aside from standard shelter services, other alternative shelter services like 24 hour respite sites or warming centers for instance are temporary stay purposes for only about few days. For the population seeking long term stay at shelters, these aren't the adequate places to be in. Our study shows that as of November 2024, over 1 million people reside in traditional shelters with the rest of the shelter service types amounting to less then 250,000 people. This signifies the importance of the type of shelters that are most popular further reinforcing the need for improved budgeting and resource allocation to prioritize support at the standard shelter services that experience large volume of people.
+
+## Limitations  {#limitation-sec}
+
+Despite being able to extract key insights about the daily shelter service count based on the demographic, shelter type and the service it offers, there exist some weaknesses in our study. Aside from the limitations discussed for our model in the [model](#model-sec) section, this study only looks at the bed based shelter services and doesn't investigate the issues and trends in room based shelters that primarily house families and youth. In order to better allocate resources and protocols for the homeless population, it is crucial to study the trends in room based shelters and the struggles they experience. Another limitation in our study is the lack of observations relating to hidden homelessness. As highlighted by Canada Mortgage Housing Corporation [@cmhcschlWomensHomelessness], women and youth population experience hidden homeless the most and this is a potential reason why our data set contains significant observations relating to the Men demographic group.
+
+## Future Steps {#future-steps-sec}
+
+In order to identify deeper insights into the shelter systems, the following are some potential directions for future steps of this research.
+
+### Improvement to our proposed model
+Our model currently only considers the demographic, shelter type and its service. However, factors the the month of the year or location could provide significant insights into specific cities or months of the year when homelessness and shelter services reach their all time high. These could better capture any hidden relationships in the model and also provide valuable information in providing increased support to the critical months and cities.
+
+### Amalgamation of various data sources
+
+In addition to having data pertaining to daily shelter usage, we could look into data sets relating to deaths experienced in various shelters which is another dataset provided by Open Data Toronto [@opendatatoronto] or other appropriate data sources. A combined analysis on these data sources could provide richer contextual information and could help provide concrete next steps on improving shelter conditions or addressing the lack of adequate spacing.
+
+### Conducting surveys to capture missing information from our dataset
+
+Lastly, many data sets only offer quantitative information about the shelters which although critical are often only one piece of the puzzle. In order to propose appropriate next steps to the highlighted problems, we also need to look at the qualitative aspect of the situation. One way to do this is by conducting surveys into the shelter systems in Toronto which can signify the critical pain points and concerns the shelters experience on a day to day basis and how their struggles change across the various months of the year. These two findings need to be provided in tandem when proposing any solutions to some of the discussion questions we talked about in this paper.
 
 \newpage
 
-\appendix
+# Appendix {#appendix-sec}
 
-# Appendix {-}
+## Surveys and Sampling Methadology
+
+The below section discusses a potential survey they we would carry out to better understand the scope of our problem domain.
+
+#### Motivation for the Survey
+As discussed in the [future steps](#future-steps-sec), we argue that any data set used can only capture the quantitative aspects of the problem domain. In order to better understand our research question, we need qualitative information about some of our key predictors and other relevant information. Our aim is by gathering responses from the below survey response from various shelters across Toronto, we can better understand our problem and offer solutions to problems that exist in the current policies that shelters experience today.
+
+#### Survey Introduction
+Thank you for taking the time to participate in this survey! We are collecting data from various shelters across Toronto to better understand the key factors that influence the count of daily overnight services at these shelters and what demographic of population is most at risk for homelessness presently. Your responses will help create improved policies and regulations for the people experiencing homelessness in Toronto. We hope to design systems that offer the best support these groups of people.
+
+We would like to let you know that your identity will be kept confidential and the responses from this survey will only be used for research purposes. The survey is expected to take about 10 to 15 minutes.
+
+If you have any questions, please contact:
+
+- **Name**: Aakash Vaithyanathan
+- **Email**: [aakash.vaithyanathan@mail.utoronto.ca](mailto:aakash.vaithyanathan@mail.utoronto.ca)
+
+### Survey Questions
+
+#### Section 1: Shelter Information
+
+1. **Shelter Name**  
+   Text response:  
 
 
-# Additional data details
+2. **Unique Shelter ID (if available)**  
+   Text response:  
 
-# Model details {#sec-model-details}
 
-## Posterior predictive check
+3. **City Located In** (Select one)
+   - [ ] Toronto
+   - [ ] Mississauga
+   - [ ] Scarborough
+   - [ ] Oakville
+   - [ ] Etobicoke
+   - [ ] North York
 
-In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. This shows...
+#### Section 2: Shelter specific information
 
-In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows... 
+4. **Demographics of people at shelter** (Select all that apply):  
+   - [ ] Men 
+   - [ ] Women
+   - [ ] Youth
+   - [ ] Families / Couples
+   - [ ] Mixed Adults (Any gender identity)
 
-```{r}
-#| eval: true
-#| echo: false
-#| message: false
-#| warning: false
-#| label: fig-ppcheckandposteriorvsprior
+5. **Services Offered** (Select all that apply):  
+   - [ ] Shelter  
+   - [ ] 24 hour Respite Site
+   - [ ] 24 hour Women's Drop In
+   - [ ] Alternative Space Protocol
+   - [ ] Top Bunk Contingency Space
+   - [ ] Warming Centre
+
+6. **Shelter Tyoe** (Select one):  
+   - [ ] Emergency
+   - [ ] Transitional
+
+#### Section 3: Statistics about shelter
+
+7. **Average daily count of services at shelter** (Select one): 
+   - [ ] Between 1 and 10 
+   - [ ] Between 10 and 50
+   - [ ] Between 50 and 100
+   - [ ] Over 100
+
+8. **Average monthly re-admissions to shelter** (Select one): 
+   - [ ] Between 1 and 10 
+   - [ ] Between 10 and 50
+   - [ ] Between 50 and 100
+   - [ ] Over 100
+
+#### Section 3: Capacity and Infrastructure
+
+9. **Daily occupancy rate of beds / rooms** (Select one):  
+   - [ ] Below 50%
+   - [ ] Between 50% and 75%
+   - [ ] Between 75% to 90%
+   - [ ] Over 90%
+
+10. **Available spacing between individual beds** (Select one):  
+   - [ ] Less than 2 feet
+   - [ ] Between 2 to 5 feet
+   - [ ] Over 5 feet
+
+11. **How often are people transferred to a different shelter** (Select one to the best of your knowledge):  
+   - [ ] Not very often (Once in a quarter)
+   - [ ] Often (Few times a quarter)
+   - [ ] Very often (More than once a month)
+
+#### Section 4: Outbreak Duration and Impact
+
+12. **Have people been taken to a hospital during their stay at the shelter?** (Select one)
+   - [ ] Yes
+   - [ ] No
+
+13. **What are some challenges you've experienced with the people residing at shelters?** (Select all that apply):  
+   - [ ] Experience mental health challenges  
+   - [ ] Experience physical symptoms (cold, body pain, nausea, etc)
+   - [ ] Aggressive behavior 
+   - [ ] Substance abuse (eg: drugs, alcohol)
+   - [ ] Other (Please elaborate):
+
+14. **If you selected any option for the above, please describe how did you handle this situation?** (optional): 
+
+    Text response:
+
+#### Section 5: Feedback and Additional Information
+
+15. **Do you have additional comments regarding the shelter and its ability to staff large volumes of people?** (optional):
+
+    Text response:  
+
+### Thank You
+
+Thank you for completing this survey! Your responses have been recorded. Thank you for taking the time in improving the shelter experience for the homeless population of Toronto. We greatly appreciate your support.
+
+If you would like to receive a copy of your responses, please enter your email below:  
+
+_Email:_  
+
+## Dataset Description
+
+@tbl-dataset-summary provides a brief description of the important variables used in this study in our cleaned dataset.
+```{r, message = FALSE, echo = FALSE}
+#| label: tbl-dataset-summary
+#| tbl-cap: "Description for attributes in dataset"
+
+# Create a description for each column
+column_descriptions <- data.frame(
+  Attribute = c("Demographic", "Shelter Type", "Shelter Service", "Service Count"),
+  Description = c(
+    "Demographic of the population (eg: Male, Female, Youth, etc)",
+    "Type of shelter (Emergency/Transitional)",
+    "Type of service provided by shelter (eg: Warming Center, Shelter, etc)",
+    "Total count of the demographic type seeking shelter services"
+  ))
+
+# Create a table with the descriptions
+column_descriptions %>%
+  kable(caption = "Attributes and Description Table") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
+  column_spec(1, bold = TRUE, background = "#D3D3D3") %>%
+  row_spec(0, bold = TRUE)  # Bold the header row
+
+```
+
+## Model details
+
+As described in the [model](#model-sec) section of our study, we have 3 proposed models to use of which the negative binomial model (with interaction) was chosen. The following sections provide some details about the model diagnostics and predictability.
+
+### Posterior predictive check
+
+@fig-ppcheck-models shows the graph for the posterior predictive check between the poisson model and the negative binomial model (with interaction).
+
+```{r, message = FALSE, echo = FALSE}
+#| label: fig-ppcheck-models
+#| fig-cap: "Comparing posterior prediction checks for the Poisson model and the Negative Binomial Model With Interaction"
+#| fig-subcap: ["Poisson Model Posterior Check", "Neg. Binomial (w/ Interaction) Posterior Check"]
 #| layout-ncol: 2
-#| fig-cap: "Examining how the model fits, and is affected by, the data"
-#| fig-subcap: ["Posterior prediction check", "Comparing the posterior with the prior"]
 
-pp_check(first_model) +
-  theme_classic() +
-  theme(legend.position = "bottom")
 
-posterior_vs_prior(first_model) +
+poisson_model_pp_check <- pp_check(poisson_model) +
+   theme_classic() +
+   theme(legend.position = "bottom")
+
+neg_binomial_interaction_model_pp_check <- pp_check(neg_binomial_model_interaction) +
+ theme_classic() +
+ theme(legend.position = "bottom")
+  
+poisson_model_pp_check
+neg_binomial_interaction_model_pp_check
+```
+
+### Leave-One-Out (LOO) Comparison
+
+@tbl-compare-models-loo compares each of the models loo values. The model with higher (less negative) loo value is one with the best predictive power. From the table below, we can see that our negative binomial model with interaction has the best predictive power of the proposed models.
+
+```{r, message = FALSE, echo = FALSE}
+#| label: tbl-compare-models-loo
+#| tbl-cap: "Comparing LOO for Poisson and the two Negative Binomial models"
+  poisson_model_loo <- loo(poisson_model, cores = 2)
+  neg_binomial_model_basic_loo <- loo(neg_binomial_model_basic, cores = 2)
+  neg_binomial_model_interaction_loo <- loo(neg_binomial_model_interaction, cores = 2)
+  
+  loo_comparison <- loo_compare(poisson_model_loo, neg_binomial_model_basic_loo, neg_binomial_model_interaction_loo)
+  
+  # Convert loo_comparison to a tidy data frame
+  loo_comparison_df <- as.data.frame(loo_comparison)
+  
+  # Create a kable table
+ loo_comparison_df %>%
+   select(elpd_diff, se_diff) %>%  # Select only the desired columns
+   kable(caption = "Model Comparison using LOO", digits = 2) %>%
+   kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
+   row_spec(0) %>%
+   column_spec(1, background = "#D3D3D3")
+
+
+```
+
+### Model summary
+
+The below table describes the summary statistics for the explanatory model chosen in our study.
+
+```{r, message = FALSE, echo = FALSE}
+#| label: tbl-summary-explanatory-model
+#| tbl-cap: "Explanatory Model: Service Count by Demographic Type, Shelter Type and Service Type"
+
+# Tidy the model results
+model_summary <- tidy(neg_binomial_model_interaction)
+
+# Create a pretty formatted table with alternating row colors
+model_summary %>%
+  kable(caption = "Negative Binomial Model Summary with Interaction Terms") %>%
+  kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
+  column_spec(1, bold = TRUE, background = "#D3D3D3") %>%  # Highlight first column
+  row_spec(0, bold = TRUE) %>%  # Bold the header row
+  row_spec(seq(1, nrow(model_summary), 2), background = "#F5F5F5")  # Alternate row colors
+
+```
+
+### QQ-Plot For Explanatory Model
+
+@fig-qq-plot-explanatory-model plots the QQ Plot for the explanatory model chosen in our study.
+
+```{r, message = FALSE, echo = FALSE}
+#| label: fig-qq-plot-explanatory-model
+#| fig-cap: "QQ-Plot for explanatory negative binomial (interaction) model"
+
+qqnorm(residuals(neg_binomial_model_interaction))
+
+```
+
+### Pareto K-Diagnostics
+
+@fig-pareto-k-diagnostics plots the Pareto K-Diagnostics for our proposed model. A k-value of less than 0.7 indicates that our proposed model fits the data without any issues in convergence.
+
+```{r, message = FALSE, echo = FALSE}
+#| label: fig-pareto-k-diagnostics
+#| fig-cap: "Graph of pareto K-Diagnostics for explanatory model"
+
+# Negative Binomial model (interaction)
+ pareto_k_neg_binomial_interaction <- data.frame(Observation = 1:length(neg_binomial_model_interaction_loo$diagnostics$pareto_k),
+                                                 Pareto_k = neg_binomial_model_interaction_loo$diagnostics$pareto_k)
+ 
+ plot_neg_binomial_interaction <- ggplot(pareto_k_neg_binomial_interaction, aes(x = Observation, y = Pareto_k)) +
+   geom_point() +
+   geom_hline(yintercept = 0.7, color = "red", linetype = "dashed") +
+   labs(title = "Negative Binomial Model (Interaction) - Pareto-k Diagnostic", y = "Pareto-k Value", x = "Observation") +
+   theme_minimal()
+ 
+ plot_neg_binomial_interaction
+
+```
+
+### Residual Plot for explanatory model
+
+@fig-residual-plot-explanatory-model shows the residual plot for our explanatory model. From the below graph we can see that residuals are spread randomly along the intercept line indicating our model is a good fit for the data set.
+
+```{r, message = FALSE, echo = FALSE}
+#| label: fig-residual-plot-explanatory-model
+#| fig-cap: "Residual Plot for explanatory model"
+
+# Negative Binomial Model Interaction Residuals
+neg_binomial_interaction_preds <- predict(neg_binomial_model_interaction)
+neg_binomial_interaction_residuals <- residuals(neg_binomial_model_interaction)
+
+# Create residual plot
+residual_plot <- ggplot(data.frame(predictions = neg_binomial_interaction_preds, 
+                                   residuals = neg_binomial_interaction_residuals), 
+                        aes(x = predictions, y = residuals)) +
+  geom_point(color = "blue", alpha = 0.6) +  # Scatter plot of residuals
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +  # Horizontal line at y=0
+  ggtitle("Residual Plot: Negative Binomial Model Interaction") +
+  xlab("Fitted Values (Predictions)") +
+  ylab("Residuals") +
   theme_minimal() +
-  scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "bottom") +
-  coord_flip()
+  theme(plot.title = element_text(hjust = 0.5, size=14))  # Center title
+
+
+# Print the plot
+print(residual_plot)
+
 ```
 
-## Diagnostics
 
-@fig-stanareyouokay-1 is a trace plot. It shows... This suggests...
+### Markov Chain Monte Carlo Convergence Diagnostic
 
-@fig-stanareyouokay-2 is a Rhat plot. It shows... This suggests...
+@fig-mcmc-convergence shows the convergence of our predictors in our explanatory model using the Markov Chain Monte Carlo (MCMC) convergence algorithm.
 
-```{r}
-#| echo: false
-#| eval: true
-#| message: false
-#| warning: false
-#| label: fig-stanareyouokay
-#| fig-cap: "Checking the convergence of the MCMC algorithm"
-#| fig-subcap: ["Trace plot", "Rhat plot"]
-#| layout-ncol: 2
+```{r, message = FALSE, echo = FALSE}
+#| label: fig-mcmc-convergence
+#| fig-cap: "Checking the convergence of the predictors using MCMC algorithm"
 
-plot(first_model, "trace")
-
-plot(first_model, "rhat")
+plot(neg_binomial_model_interaction, "trace")
 ```
 
+### R-Hat Convergence Diagnostic
+
+@fig-r-hat-convergence shows the variability in the convergence of the predictor chains using the MCMC convergence algorithm of our predictors. $\hat{R}$ values of around 1.01 indicate model has converged successfully without any extreme variability.
+
+```{r, message = FALSE, echo = FALSE}
+#| label: fig-r-hat-convergence
+#| fig-cap: "Checking the R-hat variability for predictors"
+
+plot(neg_binomial_model_interaction, "rhat")
+```
 
 
 \newpage
-
 
 # References
-
-

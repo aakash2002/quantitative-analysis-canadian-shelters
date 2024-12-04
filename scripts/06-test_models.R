@@ -36,14 +36,14 @@ neg_binomial_basic_preds <- predict(neg_binomial_model_basic, newdata = test_dat
 neg_binomial_interaction_preds <- predict(neg_binomial_model_interaction, newdata = test_data)
 
 # Calculate RMSE for each model's predictions
-rmse_poisson <- sqrt(mean((poisson_preds - test_data$service_user_count)^2))
-rmse_neg_binomial_basic <- sqrt(mean((neg_binomial_basic_preds - test_data$service_user_count)^2))
-rmse_neg_binomial_interaction <- sqrt(mean((neg_binomial_interaction_preds - test_data$service_user_count)^2))
+rmse_poisson <- sqrt(mean((poisson_preds - test_data$service_count)^2))
+rmse_neg_binomial_basic <- sqrt(mean((neg_binomial_basic_preds - test_data$service_count)^2))
+rmse_neg_binomial_interaction <- sqrt(mean((neg_binomial_interaction_preds - test_data$service_count)^2))
 
 # Calculate MAE for each model's predictions
-mae_poisson <- mean(abs(poisson_preds - test_data$service_user_count))
-mae_neg_binomial_basic <- mean(abs(neg_binomial_basic_preds - test_data$service_user_count))
-mae_neg_binomial_interaction <- mean(abs(neg_binomial_interaction_preds - test_data$service_user_count))
+mae_poisson <- mean(abs(poisson_preds - test_data$service_count))
+mae_neg_binomial_basic <- mean(abs(neg_binomial_basic_preds - test_data$service_count))
+mae_neg_binomial_interaction <- mean(abs(neg_binomial_interaction_preds - test_data$service_count))
 
 # Print MAE values
 cat("MAE for Poisson model:", mae_poisson, "\n")

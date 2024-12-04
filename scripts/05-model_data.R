@@ -26,19 +26,23 @@ test_data <- read_parquet(here::here("data/02-analysis_data/analysis_test_shelte
 ##############
 # Build models
 ##############
-
 # Fit Poisson regression model
-poisson_model <- stan_glm(service_user_count ~ population_type + program_model + program_area + overnight_service_type,
-                     family = poisson(link = "log"), 
+poisson_model <- stan_glm(service_count ~ demographic + shelter_type + service_type,
+                     family = poisson(link = "log"),
+                     prior = normal(0, 2.5, autoscale = TRUE),
                      data = train_data)
 
 # Fit various Negative Binomial models
-neg_binomial_model_basic <- stan_glm(service_user_count ~ population_type + program_model + program_area + overnight_service_type,
+neg_binomial_model_basic <- stan_glm(service_count ~ demographic + shelter_type + service_type,
                                      family = neg_binomial_2(link = "log"),
+                                     prior = normal(0, 2.5, autoscale = TRUE),
+                                     prior_aux = exponential(1, autoscale=TRUE),
                                      data = train_data)
 
-neg_binomial_model_interaction <- stan_glm(service_user_count ~ population_type * program_model + program_area + overnight_service_type,
+neg_binomial_model_interaction <- stan_glm(service_count ~ demographic * shelter_type + service_type,
                                      family = neg_binomial_2(link = "log"),
+                                     prior = normal(0, 2.5, autoscale = TRUE),
+                                     prior_aux = exponential(1, autoscale=TRUE),
                                      data = train_data)
 
 
