@@ -16,6 +16,7 @@ The repo is structured as follows:
 - `other` contains relevant sketches and LLM usage documentation.
   - `other/llm` contains a usage.txt file outlining the prompts used by ChatGPT to assist in the programming aspect of the project.
   - `other/sketches` contains an 'analysis_graphs.jpeg' and 'shelter_dataset.jpeg' outlining how we expect our dataset and graphs to look in this project.
+  - `other/datasheet` contains the datasheet the Quarto document, its rendered pdf, and the bibliography document.
 - `paper` contains the files used to generate the paper.
   - `paper/paper.qmd` contains a Quarto document used to write the report and includes R components to generate graphs.
   - `paper/paper.pdf` contains the compiled pdf document per the Quarto document content.
@@ -32,7 +33,7 @@ The repo is structured as follows:
 
 ## How to run this project?
 
-Please open the __quantitative-analysis-of-canada-shelters.Rproj__ file to run the project. It is recommended you have R and RStudio v4.4 installed on your machine. To compile the Quarto document, please navigate to the paper.qmd under the 'paper' folder and click __Render__.
+Please open the __quantitative_analysis_of_canada_shelters.Rproj__ file to run the project. It is recommended you have R and RStudio v4.4 installed on your machine. To compile the Quarto document, please navigate to the paper.qmd under the 'paper' folder and click __Render__.
 
 ## Important Note
 
