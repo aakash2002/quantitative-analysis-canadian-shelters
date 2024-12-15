@@ -16,7 +16,7 @@ The repo is structured as follows:
 - `other` contains relevant sketches and LLM usage documentation.
   - `other/llm` contains a usage.txt file outlining the prompts used by ChatGPT to assist in the programming aspect of the project.
   - `other/sketches` contains an 'analysis_graphs.jpeg' and 'shelter_dataset.jpeg' outlining how we expect our dataset and graphs to look in this project.
-  - `other/datasheet` contains the datasheet the Quarto document, its rendered pdf, and the bibliography document.
+  - `other/datasheet` contains the datasheet for the dataset used. It includes the Quarto document, its rendered pdf, and the bibliography document used in the Quarto document.
 - `paper` contains the files used to generate the paper.
   - `paper/paper.qmd` contains a Quarto document used to write the report and includes R components to generate graphs.
   - `paper/paper.pdf` contains the compiled pdf document per the Quarto document content.
