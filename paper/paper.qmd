@@ -35,9 +35,9 @@ library(gridExtra)
 
 # Introduction {#intro-sec}
 
-Homeless Shelters are the backbone support system to the growing problem of homelessness in Toronto and other parts of Canada. In 2023, the City of Toronto declared homelessness as a significant emergency that needs immediate attention [@homelessnessAsEmergency]. Aside from not being able to afford proper meals, or a roof over their heads, the homeless population also are at increased risk of health concerns due to compromised immune systems and lack of hygienic circumstances either on the streets or at crowded shelters that they call home. Since 2018, visits to non-emergent emergency room by homeless people has increased by over 24% [@growthOfHomelessness]. Before more policies and findings are allocated to address this problem, it is important to understand the population that most experiences this issue and what factors play a key contributing role.
+Homeless Shelters are the backbone support system to the growing problem of homelessness in Toronto and across Canada. In 2023, the City of Toronto declared homelessness as a significant emergency that needs immediate attention [@homelessnessAsEmergency]. Aside from not being able to afford proper meals or a roof over their heads, the homeless population also are at increased risk of health concerns due to compromised immune systems and lack of hygienic circumstances either on the streets or at crowded shelters that they call home. Since 2018, visits to non-emergent emergency room by homeless people has increased by over 24% [@growthOfHomelessness]. Before more policies and findings are allocated to address this problem, it is important to understand the population that most experiences this issue and what factors play a key contributing role.
 
-This study estimates the daily number of service counts (our outcome variable) in shelters by examining the demographic group, the type of shelter and the services they offer. By analyzing these relationships, the study evaluates how changes in these predictors affect daily shelter service count. The research question this paper aims to answer is: "What factors influence the preference for shelters that the Toronto demographics seek". To help answer this question, we use a Negative Binomial Model with an interaction term between the demographics and the shelter type. We are interested in examining if the interaction between the above mentioned predictors can better model the relationship between the predictors and the outcome variable.
+This study estimates the daily number of service counts in shelters by examining the demographic group, the type of shelter and the services they offer. By analyzing the relationships between these variables, the study evaluates how changes in these predictors affect daily shelter service count. The research question this paper aims to answer is: "What factors influence the preference for shelters that the Toronto demographics seek". To help answer this question, we use a Negative Binomial Model with an interaction term between the demographics and the shelter type. We are interested in examining if the interaction between the above mentioned predictors can better model the relationship between the predictors and the outcome variable.
 
 Our findings suggest that Men are the majority group that tend to shelter services with Emergency based shelters being their primary shelter type. These type of shelters allow individuals to stay for a short duration of about a month and allow re-admissions at a later date [@emergencyShelterType]. In addition, as of November 2024, our study identified Emergency based shelters as the most popular shelters with increasing population at these centers. Our study highlights the need for addressing these issues before any potential health outbreaks occur at these populous shelters.
 
@@ -49,7 +49,7 @@ The remainder of this paper is structured as follows: The [data](#data-sec) disc
 
 In order to understand the factors influencing how many people seek shelter services, we decided to use the data provided by Open Data Toronto [@opendatatoronto]. The data set is maintained and published by Toronto Shelter & Support Services [@shelterServiceDataset] under the Open Government License - Toronto. The data set contains information regarding the various shelter types across Toronto offering different types of overnight shelter services along with the daily count and the demographic of the population. In addition, it also includes information about the type of capacity it offers which is either a bed based or room based service. The data set also contains daily statistics about the available funding beds/rooms, the current used beds/rooms and the rate of occupancy of beds/rooms. Each row also specifies the date when it was collected.
 
-Since the data provides both bed based and room based shelter services, rows of data that are of bed based capacity type will not include any data for room based capacity. To address this, we decided to focus on the bed based shelter capacity in our study. The motivation for why is because a key factor we're interested in studying is the trends in the various demographic groups that seek shelter services. Room based shelter services are primarily focused towards families or couples [@shelterUsageType] which may skew our analysis.
+Since the data provides both bed based and room based shelter services, rows of data that are of bed based capacity type will not include any data for room based capacity. To address this, we decided to focus on the bed based shelter capacity in our study. The motivation behind this is due to the fact that a key factor we're interested in studying is the trends in the various demographic groups that seek shelter services. Room based shelter services are primarily focused towards families or couples [@shelterUsageType] which may skew our analysis.
 
 This data set is updated daily and has the following supported formats: CSV, JSON and XML. It includes data between the year 2021 to 2024. In our study, we decided to use the 2024 data set which includes the daily shelter service information from January 1, 2024 to November 26, 2024.
 
@@ -67,7 +67,7 @@ A sample of the cleaned data set is described in @tbl-sample-rows-cleaned.
      kable(col.names = c("Demographic", "Shelter Type", "Service Type", "Service Count"))
 ```
 
-The data set contains 44300 observations and after removing room based shelter observations and any missing values we are left with 31484 data points for analysis. The process of cleaning the data was done using the R [@citeR] and Janitor [@janitor] package. The key steps taken in data cleaning includes standardizing column names to only contain lower case letters and underscores. Next, we select the rows of data that correspond bed based capacity. Following this, we select the desired columns for our study and remove all missing values. Since the independent variables include categorical types, we convert these to factors and rename the variables to be less ambiguous. As mentioned previously, a key factor we're interested in observing is the role of demographic group in the count of users seeking shelter services. Therefore, we re-level our data to use 'Men' as our point of reference for comparison. Finally, we save our data as a parquet file, compressing the file size significantly using the Arrow [@citeArrow] package. In addition to saving the cleaned data set, we also split our data into training and testing set for analysis by the statistical models we later build in this study. This is done using the Caret [@citeCaret] package. The training and testing data set parquet files are also saved. All the graphs shown in the dataset are made using `ggplot2` [@ggplot2] package. All the tables in this study are created using `kable` [@citeKnitr].
+The data set contains 44300 observations and after removing room based shelter observations and any missing values we are left with 31484 data points for analysis. The process of cleaning the data was done using the R [@citeR] and Janitor [@janitor] package. The key steps taken in data cleaning includes standardizing column names to only contain lower case letters and underscores. Next, we select the rows of data that correspond bed based capacity. Following this, we select the desired columns for our study and remove all missing values. Since the independent variables include categorical types, we convert these to factors and rename the variables to be less ambiguous. As mentioned previously, a key factor we're interested in observing is the role of demographic group in the count of users seeking shelter services. Therefore, we re-level our data to use 'Men' as our point of reference for comparison. Finally, we save our data as a parquet file, compressing the file size significantly using the Arrow [@citeArrow] package. In addition to saving the cleaned data set, we also split our data into training and testing set for analysis by the statistical models we later build in this study. This is done using the Caret [@citeCaret] package. The training and testing data set parquet files are also saved. All the graphs shown in the data set are made using `ggplot2` [@ggplot2] package. All the tables in this study are created using `kable` [@citeKnitr].
 
 ## Measurement
 
@@ -76,9 +76,9 @@ This data set outlines daily list of active overnight shelter services part of t
 Each shelter system records the details of the daily overnight service that it offers. The daily service count in the shelter is the total count for the recorded day and is stored as an integer in the data set. Categorical fields like service type, shelter type, demographic are stored as character type in the data set. Each row is representative of the daily service unique to the specific demographic, service type and shelter type along with the date when it was recorded into the system. Each shelter also includes a unique shelter ID and an organization ID for easy identification. It is important to keep in mind that since the SMIS database is updated at 4 AM the following data, at any given point in time, the data set may not be indicative of the current state of the services offered by various shelters.
 
 
-## Outcome variable — Service Count
+## Outcome Variable — Service Count
 
-The service count attribute represents the total count of individuals that seek overnight shelter services for the given day. This information is made available from the data set and gives an overview of the daily service workload across shelters. @fig-freq-service-count-by-demographic describes the distribution of the service count by various demographic groups. @fig-freq-service-count-by-shelter-type describes the distribution of the service count by shelter types across Toronto and @fig-freq-service-count-by-service-type describes the distribution of the service count by the various overnight services that shelters in Toronto offer.
+The service count attribute represents the total count of individuals that seek overnight shelter services for the given day. This information is made available from the data set and gives an overview of the daily service workload across shelters. @fig-freq-service-count-by-demographic describes the distribution of the service count by various demographic groups. @fig-freq-service-count-by-shelter-type describes the distribution of the service count by shelter types and @fig-freq-service-count-by-service-type describes the distribution of the service count by the various overnight services that shelters in Toronto offer.
 
 ```{r, message = FALSE, echo = FALSE}
 #| label: fig-freq-service-count-by-demographic
@@ -286,9 +286,9 @@ ggplot(freq_data, aes(x = shelter_type, y = count, fill = shelter_type)) +
 
 # Model {#model-sec}
 
-## Model overview
+## Model Overview
 
-In order to study the count of people seeking shelter services, we decided to build a negative binomial regression framework. Since in our study, we are interested in understanding the count of people, a regression model is preferred. The reason for why a negative binomial model is chosen over other alternatives such as poisson model which is also used to model count is due to the nature of the data distribution. From @tbl-summary-stat-service-count, we can see that our variance is significantly larger than our mean. When this happens, we say that there exist overdispersion in our data set [@citeRohan]. The poisson model assumes equal mean and variance which is clearly not true for our data set. Hence, using a poisson model would significantly under fit our data. Furthermore, a linear regression model isn't a viable option either since it's used for modeling continuous data where as we are interested in modeling the count data for specific predictor variables. Thus, we have chosen the negative binomial regression model as our chosen model for this study as these are specifically designed to model count data with overdispersion making them appropriate for our situation.
+In order to study the count of people seeking shelter services, we decided to build a negative binomial regression model. Since in our study, we are interested in understanding the count of people, a regression model is preferred. The reason for why a negative binomial model is chosen over other alternatives such as Poisson model which is also used to model count is due to the nature of the data distribution. From @tbl-summary-stat-service-count, we can see that our variance is significantly larger than our mean. When this happens, we say that there exist overdispersion in our data set [@citeRohan]. The Poisson model assumes equal mean and variance which is clearly not true for our data set. Hence, using a Poisson model would significantly under fit our data. Furthermore, a linear regression model isn't a viable option either since it is used for modeling continuous data where as we are interested in modeling the count data for specific predictor variables. Thus, we have chosen the negative binomial regression model as our chosen model for this study as these are specifically designed to model count data with overdispersion making them appropriate for our situation.
 
 ```{r, message = FALSE, echo = FALSE}
 #| label: tbl-summary-stat-service-count
@@ -310,7 +310,7 @@ kable(stats_data,
   kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
 ```
 
-## Model setup
+## Model Setup
 
 The setup for the Negative Binomial Regression model is as follows:
 
@@ -332,22 +332,22 @@ In the above model:
 - $\phi$ is the **dispersion parameter** that controls the degree of overdispersion in the negative binomial distribution.
 All coefficients ($\beta_0, \beta_1, \beta_2$) are assigned the default prior of $Normal(0, 2.5)$ from the `rstanarm` package [@rstanarm]. This choice of priors are called weakly informative priors and are designed to stabilize computation offering moderate regularization. This allows the coefficients to scale naturally to the variability in the data.
 
-The prior distribution used for $\phi$, the overdispersion parameter is $Exponential(1)$. By including this distribution, we specify that our data includes overdispersion and allow the model to adjust for the data variability. Alternative distributions that were experimented were $Exponential(2)$ and $Exponential(0.5)$ to control the degree of variability allowed by the model. However, we found there was no significant difference between the distributions and decided to proceed with $Exponential(1)$ for our model setup. 
+The prior distribution used for $\phi$, the overdispersion parameter is $Exponential(1)$. By including this distribution, we specify that our data includes overdispersion and allow the model to adjust for the data variability. Alternative distributions that were experimented were $Exponential(2)$ and $Exponential(0.5)$ to control the degree of variability allowed by the model. However, we found there was no significant difference between the distributions and decided to proceed with $Exponential(1)$ for our model setup.
 
 All the predictor variables are categorical in our model and are converted to factors during the data cleaning process. Since we know categorical variables have a distinct set of values that they take in our data set, by converting them to factors, we assign each of them an integer value to take [@factorExplanation]. This allows them to be represented as integers when fitting our above described model.
 
 
-## Model selection
+## Model Selection
 
-As discussed above, due to the presence of overdispersion in our data set, we decided to choose the negative binomial model over the poisson model. For our model selection process, we built a total of three bayesian models. The first is the poission model and the other two are negative binomial models. One of the negative binomial model includes an interaction term between demographic and shelter type to explore whether there is a relationship between the type of shelters the population tends to seek. 
+As discussed above, due to the presence of overdispersion in our data set, we decided to choose the negative binomial model over the Poisson model. For our model selection process, we built a total of three Bayesian models. The first is the Poisson model and the other two are negative binomial models. One of the negative binomial model includes an interaction term between demographic and shelter type to explore whether there is a relationship between the type of shelters the population tends to seek.
 
-From the above section, in addition to checking for the presence of overdispersion, we also compared the three models predictive power. This is done using the Leave-One-Out Cross Validation (LOO) Comparison method. The LOO comparison allows us to compare the Expected Log Pointwise Predictive Density (ELPD) between each of the models and identify which model has the best predictive power. The model with its ELPD difference closest to 0 is the model with best predictive power [@citeRohan]. We use the `loo_compare()` function using the `rstanarm` package to compare the ELPD of the above three models. This function creates a matrix of the three models and returns the pairwise ELPD difference between each. The best model is output at the top of the matrix and will always have it's ELPD difference as 0 [@citeLoo]. From @tbl-compare-models-loo, we can see that our negative binomial model with interaction has the best predictive capabilities while address the overdispersion that exists in our data set. Therefore, we have decided to use this model in our study.
+From the above section, in addition to checking for the presence of overdispersion, we also compared the three models predictive power. This is done using the Leave-One-Out Cross Validation (LOO) Comparison method. The LOO comparison allows us to compare the Expected Log Pointwise Predictive Density (ELPD) between each of the models and identify which model has the best predictive power. The model with its ELPD difference closest to 0 is the model with best predictive power [@citeRohan]. We use the `loo_compare()` function using the `rstanarm` package to compare the ELPD of the above three models. This function creates a matrix of the three models and returns the pairwise ELPD difference between each. The best model is output at the top of the matrix and will always have it's ELPD difference as 0 [@citeLoo]. From @tbl-compare-models-loo, we can see that our negative binomial model with interaction has the best predictive capabilities while addressing the overdispersion that exists in our data set. Therefore, we have decided to use this model in our study.
 
-## Model diagnostics and validation
+## Model Diagnostics and Validation
 
-Aside from performing the LOO comparison on the above models, we also asses their actual predictive power and variability. The two metrics we use for this is calculating the Mean Absolute Error (MAE) and Root Mean Squared Error (RMSE) for our models. During the data cleaning steps outlined in [data overview](#data-sec) section, we mentioned that we split our data set into training and testing set using the caret package [@citeCaret]. Since we have sufficient data points in our study, by using an 80-20 split, we were able to have sufficient training and test data. Each of the described models is fitted on the training data and the diagnostics are evaluated on the testing data. From @tbl-compare-models-mae, we observe that the negative binomial model without interaction had the least MAE of the three models. However, the difference between each of the three models is negligible. Similarly from @tbl-compare-models-rmse, we observe that the negative binomial model with interaction has the least RMSE of all models however the difference between them is negligible. It is important to understand what these statistics mean. MAE measures the absolute difference in errors between the actual and predicted service count without addressing any outliers that may exist in our study. For our model, the difference in predicted and actual service count is about 25 people. The RMSE calculates the square root of the averaged errors between the predicted and actual data. The presence of outliers can impact the calculated error value as the squared difference between the predicted and actual observations can be large. In our model, the negative binomial model with interaction has an RMSE of about 40.
+Aside from performing the LOO comparison on the above models, we also asses their actual predictive power and variability. The two metrics we use for this is calculating the Mean Absolute Error (MAE) and Root Mean Squared Error (RMSE) for our models. During the data cleaning steps outlined in [data overview](#data-sec) section, we mentioned that we split our data set into training and testing set using the caret package [@citeCaret]. Since we have sufficient data points in our study, by using an 80-20 split, we were able to have sufficient training and testing data. Each of the described models is fitted on the training data and the diagnostics are evaluated on the testing data. From @tbl-compare-models-mae, we observe that the negative binomial model without interaction had the least MAE of the three models. However, the difference between each of the three models is negligible. Similarly from @tbl-compare-models-rmse, we observe that the negative binomial model with interaction has the least RMSE of all models however the difference between them is negligible. It is important to understand what these statistics mean. MAE measures the absolute difference in errors between the actual and predicted service count without addressing any outliers that may exist in our study. For our model, the difference in predicted and actual service count is about 25 people. The RMSE calculates the square root of the averaged errors between the predicted and actual data. The presence of outliers can impact the calculated error value as the squared difference between the predicted and actual observations can be large. In our model, the negative binomial model with interaction has an RMSE of about 40 people.
 
-A key limitation in the model is the significant over dispersion that exists along with any potential outliers in our data set. These results explain why our model demonstrates a high MAE and RMSE statistics. However, we cannot conclude on the models predictive power simply by observing the MAE and RMSE and must explore other diagnostics methods to determine the models predictive power. @fig-ppcheck-models outlines the predictive power of each of the three model by plotting the posterior predictive check. 
+A key limitation in our proposed model is the presence of significant overdispersion and presence of outliers in our data set. These results explain why our model demonstrates a high MAE and RMSE statistics. However, we cannot conclude on the models predictive power simply by observing the MAE and RMSE and must explore other diagnostics methods to determine the models predictive power. @fig-ppcheck-models outlines the predictive power of each of the three model by plotting the posterior predictive check. 
 
 By observing these diagnostics methods, we conclude that our negative binomial model with interaction is the optimal explanatory model to use for the purposes of our study.
 
@@ -429,14 +429,14 @@ rmse_table %>%
 The key findings from our study are discussed in the below sections.
 
 ## Model Summary
-The summary table of the model summary was generated using `modelsummary` [@citeModelSummary], `broom.mixed` [@citeBroomMixed] and `kableExtra` [@citeKableExtra] packages. In this study, one of the factors we are interested in exploring is the distribution of the various demographics that seek shelter services. For this purposes, as outlined in the data cleaning steps, we re-leveled our demographics column to use Men as the reference column. @tbl-summary-explanatory-model outlines the estimates for the various categorical values that influence the service counts in various shelters across Canada. The intercept term represents the service count for the day when the predictor variables are at the reference level. The model summary automatically selects the first appearing categorical factor value as the reference in our data set. However, since we have explicitly specified 'Men' as the reference level for demographic, the model selects this as the reference. Therefore in our model, our intercept has a value of 4.2 which means that when the demographic for the day is men, for a shelter that is an emergency type and offers 24 hour respite site overnight service, we have about approximately 5 service counts in that shelter for the day for the specific group.
+The summary table of the model was generated using `modelsummary` [@citeModelSummary], `broom.mixed` [@citeBroomMixed] and `kableExtra` [@citeKableExtra] packages. In this study, one of the factors we are interested in exploring is the distribution of the various demographics that seek shelter services. For this reason, as outlined in the data cleaning steps, we re-leveled our demographics column to use Men as the reference column. @tbl-summary-explanatory-model outlines the estimates for the various categorical values that influence the service counts in various shelters across Canada. The intercept term represents the service count for the day when the predictor variables are at the reference level. The model summary automatically selects the first appearing categorical factor value as the reference in our data set. However, since we have explicitly specified 'Men' as the reference level for demographic, the model selects this as the reference. Therefore in our model, our intercept has a value of 4.2 which means that when the demographic for the day is men, for a shelter that is an emergency type and offers 24 hour respite site overnight service, we have about approximately 5 service counts in that shelter for the day for the specific group.
 
 
 ## Credibility Intervals for Explanatory Model
 
-In addition to the model summary, we can look at the credibility interval for our model which was constructed using the `broom` [@citeBroom] package. The 95% credibility interval outlines the probability of confidence that each predictor variable takes in our model. From @fig-credibility-interval, we can see that our intercept term that specifies the daily shelter service count for the day is positively correlated with the predictors in our model as it lies greater than 0 and has a value of about 4.25. 
+In addition to the model summary, we can look at the credibility interval for our model which was constructed using the `broom` [@citeBroom] package. The 95 % credibility interval outlines the probability of confidence that each predictor variable takes in our model. From @fig-credibility-interval, we can see that our intercept term that specifies the daily shelter service count for the day is positively correlated with the predictors in our model as it lies greater than 0 and has a value of about 4.25.
 
-Since the credibility interval outlines the certainty of the estimates for various predictors, we can see that the model shows high uncertainty for "Alternative Space Protocol" and "Top Bunk Contingency Space" shelter service types. A possible explanation for this is because from @fig-freq-by-service-type, we know that these make up for about 2 % and 2.8 % of our data set distributions and lack of sufficient observations explains why the model has high variability in predicting these service types with certainty. Furthermore, we see that the model has moderately high uncertainty when estimating for Transitional shelter type. An equivalent justification can be made for this as from @fig-freq-by-shelter-type, we know that transitional shelter types make up for only 23.4 % of our observations so the model experiences some degree of uncertainty. For the rest of the predictors, the credibility interval is relatively small indicating that the model is certain in predicting the estimates and their effects on the daily service count.
+Since the credibility interval outlines the 95 % confidence of the estimates for various predictors, we can see that the model shows high uncertainty for "Alternative Space Protocol" and "Top Bunk Contingency Space" shelter service types. A possible explanation for this is because from @fig-freq-by-service-type, we know that these make up for about 2 % and 2.8 % of our data set distributions and lack of sufficient observations explains why the model has high variability in predicting these service types with certainty. Furthermore, we see that the model has moderately high uncertainty when estimating for Transitional shelter type. An equivalent justification can be made for this as from @fig-freq-by-shelter-type, we know that transitional shelter types make up for only 23.4 % of our observations so the model experiences some degree of uncertainty. For the rest of the predictors, the credibility interval is relatively small indicating that the model is certain in predicting the estimates and their effects on the daily service count.
 
 From @tbl-summary-explanatory-model and @fig-credibility-interval, we can make the following key observations
 
@@ -464,38 +464,38 @@ ggplot(tidy_model, aes(x = term, y = estimate, ymin = conf.low, ymax = conf.high
 ```
 
 
-### Role of Demographics in daily shelter count
+### Role of Demographics in Daily Shelter Count
 
 We observe that the "Men" demographic group is the most popular group that seeks daily overnight shelter services for the year 2024. Youth take up 39.5 % of daily shelter usage of men or equivalently, they have 60 % lower shelter usage than Men. Women take up about 67.64 % of shelter usage of men or equivalently have about 32% less shelter usage than men. Mixed Adult group takes up about 76% of the shelter usage of men or equivalently have about 24% lower rate of shelter usage compared to Men. These observations are in line with our findings from @fig-freq-service-count-by-demographic.
 
-### Role of Shelter Types in daily shelter count
+### Role of Shelter Types in Daily Shelter Count
 
 We observe that the "Emergency" shelter types is the most shelter type that offers overnight services for the year 2024. Transitional shelter types take up about 38% of daily shelter usage than that of the emergency shelter type or equivalently, have about 62% lower rate of daily shelter count than Emergency type. This observation is in line with our findings from @fig-freq-service-count-by-shelter-type.
 
-### Role of Overnight Service Type in daily shelter count
+### Role of Overnight Service Type in Daily Shelter Count
 
 We observe that the "Shelter" service type is the most populate service that people seek for the year 2024. Standard shelters are about 105 % of the daily shelter usage than a 24-hour respite shelter service type. This observation is in line with our findings from @fig-freq-service-count-by-service-type.
 
 
 # Discussion {#discussion-sec}
 
-## Why are men more likely to seek shelter services
+## Why Are Men More Likely To Seek Shelter Services
 
-This study highlights that the demographic plays a key role in the type of population group that seek overnight shelter services. From our model, we estimate that Men are the most densely populated group that seek daily overnight shelter across Toronto. As of November 2024, over 600,000 people at various shelters across Toronto constitute Male gender which is 16% more than the Mixed Adult population group, 21.4 % more than the Women population and 31.1 % more than the Youth population group that seek shelter services. This finding is in line with a study conducted by Housing Infrastructure Canada [@torontoShelterTypes2022] in the year 2022 that highlighted that from 2020 to 2022, emergency shelters saw an increase in Men population by 17% while women and youth shelters saw a 5% and 17% increase respectively. The same organization conducted a follow up to this study the following year and highlight that Toronto made up for the largest increase in available beds in shelters of about 300 beds [@torontoShelterTypes2023].
+This study highlights that the demographic plays a key role in the type of population group that seek overnight shelter services. From our model, we estimate that Men are the most densely populated group that seek daily overnight shelter across Toronto. As of November 2024, over 600,000 people at various shelters across Toronto constitute Male gender which is 16% more than the Mixed Adult population group, 21.4 % more than the Women population and 31.1 % more than the Youth population group that seek shelter services. This finding is in line with a study conducted by Housing Infrastructure Canada [@torontoShelterTypes2022] in the year 2022 that highlighted that from 2020 to 2022, emergency shelters saw an increase in Men population by 17% while women and youth shelters saw a 5% and 17% increase respectively. The same organization conducted a follow-up study the following year, highlighting that Toronto accounted for the largest increase in available shelter beds, adding approximately 300 beds. [@torontoShelterTypes2023].
 
-A key reason why men are more likely to seek shelter services than women is because the readmission of men into various shelters is a lot higher than women [@menShelterReadmission]. Emergency shelters are designed to house individuals for short term duration. This allows Men to move across various shelters and upon completing their stay in a shelter, readmit themselves in the future. Another reason for why men are the more dominant group is due to hidden homelessness. A study by Canada Mortgage Housing Corporation [@cmhcschlWomensHomelessness] highlights that women and youth are most likely to experience hidden homelessness. 
+A key reason why men are more likely to seek shelter services than women is because the readmission of men into various shelters is a lot higher than women [@menShelterReadmission]. Emergency shelters are designed to house individuals for short term duration. This allows Men to move across various shelters and upon completing their stay in a shelter, readmit themselves in the future. Another reason for why men are the more dominant group is due to hidden homelessness. A study by Canada Mortgage Housing Corporation [@cmhcschlWomensHomelessness] highlights that women and youth are most likely to experience hidden homelessness. This explains why Men are the majority group seeking shelters in Toronto.
 
-This highlights the need for effective measures to improve the situation of shelter services across Canada and prioritizing the male population that may be unable to be referred to a transitional shelter and seek multiple readmission into emergency shelters.
+This underscores the need for effective measures to enhance shelter services across Toronto, with a particular focus on addressing the needs of the male population who may lack access to transitional shelters and require multiple readmission into emergency shelters.
 
-## Daily volume at Emergency shelter types
+## Daily Volume at Emergency Shelter Types
 
-Our study shows that as of November 2024, over 1.5 million people that reside in shelters utilize emergency based shelters. These shelters are designed to accommodate individuals for short term stay of traditionally less than a month. However, these shelters allow for self referrals and readmission which allow people to move around various shelters across Toronto. This is significant as it shows the intensity of usage of emergency based shelters and the volume of people that seek it. Due to the sheer volume of people, these types of shelters are unable to offer sufficient spacing between individual beds. This is problematic as it often means that these shelters are packed with people in close proximity to one another. This comes at a huge cost as these shelters are poised for breakout due to the lack of spacing among the people [@shelterSpacingConditions]. 
+Our study shows that as of November 2024, over 1.5 million people that reside in shelters utilize emergency based shelters. These shelters are designed to accommodate individuals for short term stay, typically less than a month. However, these shelters permit self-referrals and readmission, enabling individuals to transition between different shelters across Toronto. This is significant as it shows the intensity of usage of emergency based shelters and the volume of people that seek it. Due to the sheer volume of people, these types of shelters are unable to offer sufficient spacing between individual beds. This is concerning as it often means that these shelters are packed with people in close proximity to one another. This suggests that these shelters are poised for breakout due to the lack of adequate spacing between people [@shelterSpacingConditions]. 
 
-It is important to note that our study does not consider the age groups of the population at these shelters and elderly people with compromised immune system can find themselves are an increased danger of contracting infections and other diseases. This calls for the need for adequate budgeting and allocation of resources to emergency shelters due to their high popularity among the shelter seeking community.
+It is important to note that our study does not consider the age groups of the population at these shelters and elderly people with compromised immune system can find themselves at an increased risk of contracting infections and other diseases. This calls for the need for adequate budgeting and allocation of resources to emergency shelters due to their high population among the shelter seeking community.
 
-## Need for improved infrastructure and services at standard shelters
+## Need for Improved Infrastructure and Services at Standard Shelters
 
-Aside from standard shelter services, other alternative shelter services like 24 hour respite sites or warming centers for instance are temporary stay purposes for only about few days. For the population seeking long term stay at shelters, these aren't the adequate places to be in. Our study shows that as of November 2024, over 1 million people reside in traditional shelters with the rest of the shelter service types amounting to less then 250,000 people. This signifies the importance of the type of shelters that are most popular further reinforcing the need for improved budgeting and resource allocation to prioritize support at the standard shelter services that experience large volume of people.
+Aside from standard shelter services, other alternative shelter services like 24 hour respite sites or warming centers for instance are temporary stay purposes for only about few days. For the population seeking long term stay at shelters, these aren't the adequate places to be in. Our study shows that as of November 2024, over 1 million people reside in traditional shelters with the rest of the shelter service types amounting to less then 250,000 people. This emphasizes the importance of understanding the most popular types of shelters, highlighting the need for better budgeting and resource allocation to prioritize support for standard shelter services that accommodate high volumes of people.
 
 ## Limitations  {#limitation-sec}
 
@@ -503,18 +503,19 @@ Despite being able to extract key insights about the daily shelter service count
 
 ## Future Steps {#future-steps-sec}
 
-In order to identify deeper insights into the shelter systems, the following are some potential directions for future steps of this research.
+To gain a deeper understanding of the shelter systems, the following are potential directions for the next steps of this research.
 
-### Improvement to our proposed model
-Our model currently only considers the demographic, shelter type and its service. However, factors the the month of the year or location could provide significant insights into specific cities or months of the year when homelessness and shelter services reach their all time high. These could better capture any hidden relationships in the model and also provide valuable information in providing increased support to the critical months and cities.
+### Improvement to Our Proposed Model
 
-### Amalgamation of various data sources
+Our model currently focuses on demographics, shelter types, and their services. However, incorporating additional factors such as the month of year or location could help identify  when homelessness and shelter demand are at their highest. This approach could reveal hidden patterns in the data and support efforts to allocate resources effectively during critical periods and in high-need areas.
 
-In addition to having data pertaining to daily shelter usage, we could look into data sets relating to deaths experienced in various shelters which is another dataset provided by Open Data Toronto [@opendatatoronto] or other appropriate data sources. A combined analysis on these data sources could provide richer contextual information and could help provide concrete next steps on improving shelter conditions or addressing the lack of adequate spacing.
+### Amalgamation of Various Data Sources
 
-### Conducting surveys to capture missing information from our dataset
+In addition to having data pertaining to daily shelter usage, we could look into data sets relating to deaths experienced in various shelters which is another data set provided by Open Data Toronto [@opendatatoronto] or other appropriate data sources. A combined analysis on these data sources could provide richer contextual information and could help provide concrete next steps on improving shelter conditions or addressing the lack of adequate spacing.
 
-Lastly, many data sets only offer quantitative information about the shelters which although critical are often only one piece of the puzzle. In order to propose appropriate next steps to the highlighted problems, we also need to look at the qualitative aspect of the situation. One way to do this is by conducting surveys into the shelter systems in Toronto which can signify the critical pain points and concerns the shelters experience on a day to day basis and how their struggles change across the various months of the year. These two findings need to be provided in tandem when proposing any solutions to some of the discussion questions we talked about in this paper.
+### Conducting Surveys to Capture Missing Information From Our Dataset
+
+Lastly, many data sets only offer quantitative information about the shelters which although critical are often only one piece of the puzzle. In order to propose appropriate next steps to the highlighted problems, we also need to look at the qualitative aspect of the situation. One way to do this is by conducting surveys into the shelter systems in Toronto which can signify the critical pain points and concerns the shelters experience on a day to day basis and how their struggles change across the various months of the year. These key findings need to be provided in tandem when proposing any solutions to some of the discussion questions highlighted in this paper.
 
 \newpage
 
@@ -524,11 +525,11 @@ Lastly, many data sets only offer quantitative information about the shelters wh
 
 The below section discusses a potential survey they we would carry out to better understand the scope of our problem domain.
 
-#### Motivation for the Survey
+#### Motivation For The Survey
 As discussed in the [future steps](#future-steps-sec), we argue that any data set used can only capture the quantitative aspects of the problem domain. In order to better understand our research question, we need qualitative information about some of our key predictors and other relevant information. Our aim is by gathering responses from the below survey response from various shelters across Toronto, we can better understand our problem and offer solutions to problems that exist in the current policies that shelters experience today.
 
 #### Survey Introduction
-Thank you for taking the time to participate in this survey! We are collecting data from various shelters across Toronto to better understand the key factors that influence the count of daily overnight services at these shelters and what demographic of population is most at risk for homelessness presently. Your responses will help create improved policies and regulations for the people experiencing homelessness in Toronto. We hope to design systems that offer the best support these groups of people.
+Thank you for taking the time to participate in this survey! We are collecting data from various shelters across Toronto to better understand the key factors that influence the count of daily overnight services at these shelters and what demographic of population is most at risk for homelessness presently. Your responses will help create improved policies and regulations for the people experiencing homelessness in Toronto. We hope to design systems that offer the best support to the homeless population.
 
 We would like to let you know that your identity will be kept confidential and the responses from this survey will only be used for research purposes. The survey is expected to take about 10 to 15 minutes.
 
@@ -543,12 +544,12 @@ If you have any questions, please contact:
 
 #### Section 1: Shelter Information
 
-1. **Shelter Name**  
+1. **Shelter Name** (required)
 
     Text response:  
 
 
-2. **Unique Shelter ID (if available)**  
+2. **Unique Shelter ID** (optional)
 
     Text response:  
 
@@ -561,7 +562,7 @@ If you have any questions, please contact:
     - [ ] Etobicoke
     - [ ] North York
 
-#### Section 2: Shelter specific information
+#### Section 2: Shelter Specific Information
 
 4. **Demographics of people at shelter** (Select all that apply):  
     - [ ] Men 
@@ -582,7 +583,7 @@ If you have any questions, please contact:
     - [ ] Emergency
     - [ ] Transitional
 
-#### Section 3: Statistics about shelter
+#### Section 3: Statistics About Shelter
 
 7. **Average daily count of services at shelter** (Select one): 
     - [ ] Between 1 and 10 
@@ -598,7 +599,7 @@ If you have any questions, please contact:
 
 #### Section 3: Capacity and Infrastructure
 
-9. **Daily occupancy rate of beds / rooms** (Select one):  
+9. **Daily occupancy rate of beds** (Select one):  
     - [ ] Below 50%
     - [ ] Between 50% and 75%
     - [ ] Between 75% to 90%
@@ -610,7 +611,7 @@ If you have any questions, please contact:
     - [ ] Over 5 feet
 
 11. **How often are people transferred to a different shelter** (Select one to the best of your knowledge):  
-    - [ ] Not very often (Once in a quarter)
+    - [ ] Not very often (Once a quarter)
     - [ ] Often (Few times a quarter)
     - [ ] Very often (More than once a month)
 
@@ -654,13 +655,15 @@ _Email:_
 If you have any questions regarding the survey, please contact the listed email at the start of the survey.
 
 #### Survey Data Cleaning Process
+
 Before we proceed to analyzing our survey results, it is crucial to perform data cleaning steps to ensure the consistency and validity of the data gathered. Some of the cleaning processes we need to do is to remove missing entries and duplicate submissions from the survey results. Another step we would need to take is to determine how we plan to handle text based responses. One strategy for this could be to look at the similarity in the responses and extracting semantics from the individual response. These semantics could be represented as categorical variables which could be appended to our revised model for future study.
 
 #### Survey Sampling Strategy
-To ensure our survey results are a valid representation of the population, we will employ a 
-stratified sampling approach. This style of sampling ensures that we can gather sufficient samples from population with lesser proportion of data points like 'youth' for demographic or 'transitional' shelter types. A random sampling approach wouldn't gather these under represented population well in our data set and could skew any inference we make.
 
-For stratified sampling, we can gather survey results from various strata like shelter type, demographic and shelter service which are the key influencing factors in determining the daily overnight shelter service count. These results could help us better understand the qualitative aspects of what influence shelter service counts. To use such a sampling strategy at a large scale, we would require sufficient budget to gather samples from the above described strata. If funding is limited, we could instead employ cluster sampling and focus on the Emergency shelter type given it's large proportion of overnight service counts compared to Transitional shelter type. The results from the survey could serve as a preliminary step towards improving shelter experiences for the homeless population.
+To ensure our survey results are a valid representation of the population, we will employ a 
+stratified sampling approach. This style of sampling ensures that we can gather sufficient samples from population with lesser proportion of data points like 'youth' for demographic or 'transitional' shelter types. A random sampling approach wouldn't gather these under-represented population well in our data set and could skew any inference we make.
+
+For stratified sampling, we can gather survey results from various strata like shelter type, demographic and shelter service which are the key influencing factors in determining the daily overnight shelter service count. These results could help us better understand the qualitative aspects of what influence shelter service counts. To use such a sampling strategy at a large scale, we would require sufficient budget to gather samples from the above described strata across various shelters in Toronto. If funding is limited, we could instead employ a cluster sampling strategy and focus on the Emergency shelter type given it's large proportion of overnight service counts compared to Transitional shelter type. The survey results could serve as an initial step toward enhancing shelter experiences for individuals experiencing homelessness.
 
 \newpage
 
@@ -690,13 +693,13 @@ column_descriptions %>%
 
 ```
 
-## Model details
+## Model Details
 
 As described in the [model](#model-sec) section of our study, we have 3 proposed models to use of which the negative binomial model (with interaction) was chosen. The following sections provide some details about the model diagnostics and predictability.
 
-### Posterior predictive check
+### Posterior Predictive Check
 
-@fig-ppcheck-models shows the graph for the posterior predictive check between the poisson model and the negative binomial model (with interaction).
+@fig-ppcheck-models shows the graph for the posterior predictive check between the Poisson model and the negative binomial model (with interaction).
 
 ```{r, message = FALSE, echo = FALSE}
 #| label: fig-ppcheck-models
@@ -744,7 +747,7 @@ neg_binomial_interaction_model_pp_check
 
 ```
 
-### Model summary
+### Model Summary
 
 The below table describes the summary statistics for the explanatory model chosen in our study.
 
@@ -799,7 +802,7 @@ qqnorm(residuals(neg_binomial_model_interaction))
 
 ```
 
-### Residual Plot for explanatory model
+### Residual Plot For Explanatory Model
 
 @fig-residual-plot-explanatory-model shows the residual plot for our explanatory model. From the below graph we can see that residuals are spread randomly along the intercept line indicating our model is a good fit for the data set.
 
@@ -848,8 +851,8 @@ plot(neg_binomial_model_interaction, "trace")
 ```{r, message = FALSE, echo = FALSE}
 #| label: fig-r-hat-convergence
 #| fig-cap: "Checking the R-hat variability for predictors"
-#| fig-width: 4
-#| fig-height: 3
+#| fig-width: 3
+#| fig-height: 2
 
 plot(neg_binomial_model_interaction, "rhat")
 ```
